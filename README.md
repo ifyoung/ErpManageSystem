@@ -10,3 +10,6 @@ Erp海外仓系统，第一次为别人做项目，用到的技术很简单，Ex
 在storagecrver目录下 node index.js ,启动服务端
 
 npm run build 打包项目
+
+# 最后
+希望喜欢的或者觉得还不错的朋友点一点star，谢谢
