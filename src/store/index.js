@@ -1,15 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-Vue.use(Vuex)
-
-export default new Vuex.Store({
+Window.Vue = Vue;
+Vue.use(Vuex);
+let vStore = new Vuex.Store({
   state: {
+    deleteCustomerSql: "123",
   },
-  mutations: {
-  },
-  actions: {
-  },
-  modules: {
-  }
-})
+  mutations: {},
+  actions: {},
+  modules: {},
+});
+
+export default vStore;
