@@ -31,10 +31,10 @@
         <el-col class="customer-table" :span="24">
           <el-table @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
-            <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
-            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
-            <el-table-column align="center" label="名称" prop="product_name"></el-table-column>
-            <el-table-column align="center" label="规格(cm)" prop="length_width_height" width="120px"></el-table-column>
+            <el-table-column align="center" label="客户编号" prop="customer_id" width="150px"></el-table-column>
+            <el-table-column align="center" label="公司名称" prop="company_name" width="150px"></el-table-column>
+            <el-table-column align="center" label="名称" prop="product_name" width="200px"></el-table-column>
+            <el-table-column align="center" label="规格(cm)" prop="length_width_height" width="150px"></el-table-column>
             <el-table-column align="center" label="重量(lb)" prop="weight"></el-table-column>
             <el-table-column align="center" label="仓储数量" prop="count"></el-table-column>
             <el-table-column align="center" label="入库时间" prop="come_time"></el-table-column>
