@@ -3,13 +3,16 @@
     <el-row class="height_percent_100">
       <el-col :span="24" class="height_percent_100">
         <div class="aside-title">ERP系统</div>
-        <div style="border:1px solid black;display:inline-block;min-width:100%;background-color:#66798C;color:white">
+        <div class= "user-container">
           <div style="display:inline-block">用户:{{ this.userName }}</div>
           <span style="margin-left:20px"> 身份:{{ this.userLevel }}</span>
           <div style="display:inline-block;margin-left:10%;transform:translateY(-2.5px)">
             <el-link type="success" class="el-icon-s-custom" @click="exit">登出</el-link>
           </div>
         </div>
+
+        
+        
 
         <el-menu
           :default-active="this.$router.path"
@@ -144,5 +147,11 @@ export default {
       background-color: rgb(48, 47, 47) !important;
     }
   }
+}
+.user-container{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  background-color: antiquewhite;
 }
 </style>
