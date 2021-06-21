@@ -1,12 +1,7 @@
-// homeApi.js
-var models = require("../db"); // 引入db配置
 var express = require("express"); // express框架
 var router = express.Router();
-var mysql = require("mysql");
 var $sql = require("../sqlMap"); // sql语句
-// 连接数据库
-var conn = mysql.createConnection(models.mysql);
-conn.connect();
+var conn = require("../conn") // 引用封装的mysql.js
 
 var jsonWrite = function(res, ret) {
   if (typeof ret === "undefined") {

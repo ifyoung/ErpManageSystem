@@ -1,13 +1,8 @@
-// homeApi.js
-var models = require("../db"); // 引入db配置
 var express = require("express"); // express框架
 var router = express.Router();
-var mysql = require("mysql");
 var $sql = require("../sqlMap"); // sql语句
+var conn = require("../conn") // 引用封装的mysql.js
 
-// 连接数据库
-var conn = mysql.createConnection(models.mysql);
-conn.connect();
 
 var jsonWrite = function(res, ret) {
   if (typeof ret === "undefined") {
@@ -36,7 +31,7 @@ router.post("/updateProduct", (req, res) => {
       parms.out_count,
       parms.status,
       parms.out_time,
-      
+
       parms.customer_id,
       parms.product_code,
     ],
@@ -74,7 +69,6 @@ router.post("/updateBox", (req, res) => {
 
       parms.customer_id,
       parms.box_code,
-
     ],
     function(err, result) {
       if (err) {
