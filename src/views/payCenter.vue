@@ -28,10 +28,11 @@
       </el-row>
 
       <el-row style="padding-top:5px;">
-        <el-col class="customer-table" :span="18">
+        <el-col class="customer-table" :span="24">
           <el-table @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="queryResData_trading_pagination">
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
+            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
             <el-table-column align="center" label="交易日期" prop="trading_date"></el-table-column>
             <el-table-column align="center" label="内容" prop="trading_content"></el-table-column>
             <el-table-column align="center" label="金额" prop="trading_amount"></el-table-column>
@@ -40,7 +41,7 @@
         </el-col>
       </el-row>
       <el-row type="flex" class="padding_tb">
-        <el-col :span="18">
+        <el-col :span="24">
           <el-pagination
             class="page-pagination"
             :background="true"
@@ -60,7 +61,7 @@
         <el-col :span="2">
           <el-button class="add-btn" @click="addOpen">添加</el-button>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="18">
           <el-button type="primary" :disabled="isModify" plain @click="modifyOpen">修改</el-button>
         </el-col>
         <el-col :span="2">

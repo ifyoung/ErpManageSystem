@@ -34,6 +34,7 @@
           <el-table @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
+               <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
             <el-table-column align="center" label="入库时间" prop="come_time"></el-table-column>
             <el-table-column align="center" label="名称" prop="product_name"></el-table-column>
             <el-table-column align="center" label="规格(cm)" prop="length_width_height"></el-table-column>

@@ -44,6 +44,7 @@
         <el-col class="customer-table" :span="20">
           <el-table @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
+            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
             <el-table-column align="center" label="日期" prop="trading_date"></el-table-column>
             <el-table-column align="center" label="内容" prop="trading_content"></el-table-column>
             <el-table-column align="center" label="金额" prop="trading_amount"></el-table-column>
@@ -198,64 +199,67 @@ export default {
         this.tradingReqData = { company_name: this.formData.customer_info };
       }
 
-      if (this.choose_time != "") {
-        this.$http({
-          method: "post",
-          url: this.tradingReqUrl,
-          data: this.tradingReqData,
-        })
-          .then((res) => {
-            if (res.data.length == 0 && this.choose_time != "") {
-              this.$message.warning(`没有查到日期${this.choose_time}的数据`);
-              return;
-            } else if (res.data.length == 0 && this.choose_time == "") {
-              this.$message.warning("未查询到相关数据");
-              return;
+      // if (this.choose_time != "" || this.choose_time != null) {
+      this.$http({
+        method: "post",
+        url: this.tradingReqUrl,
+        data: this.tradingReqData,
+      })
+        .then((res) => {
+          if (res.data.length == 0 && this.choose_time != "") {
+            this.$message.warning(`没有查到日期${this.choose_time}的数据`);
+            return;
+          } else if (res.data.length == 0 && this.choose_time == "") {
+            this.$message.warning("未查询到相关数据");
+            return;
+          }
+
+          if (res.data.length != 0) {
+            console.log("查询结果不为空");
+            this.$message.success("查询成功");
+            for (let item of res.data) {
+              item.trading_date = utcToCst(item.trading_date)
+                .slice(0, 10)
+                .replace(/上|下|中|午|晚|早|凌|晨/g, "")
+                .replace(/\//g, "-");
             }
 
-            if (res.data.length != 0) {
-              this.$message.success("查询成功");
+            if (this.choose_time != "") {
+              this.queryResData = [];
+
+              // 对匹配到的时间，向结果列表推进数据
               for (let item of res.data) {
-                item.trading_date = utcToCst(item.trading_date)
-                  .slice(0, 10)
-                  .replace(/上|下|中|午|晚|早|凌|晨/g, "")
-                  .replace(/\//g, "-");
-              }
-
-              if (this.choose_time != "") {
-                this.queryResData = [];
-
-                // 对匹配到的时间，向结果列表推进数据
-                for (let item of res.data) {
-                  if (item.trading_date == this.choose_time) {
-                    this.queryResData.push(item);
-                  }
+                if (item.trading_date == this.choose_time) {
+                  this.queryResData.push(item);
                 }
-                //  如果推进的数据为空，则提示唔该日期数据
-                if (this.queryResData.length == 0) {
-                  if (this.choose_time != "" && this.choose_time != null) {
-                    this.$message.warning(`没有查到日期${this.choose_time}的数据`);
-                  }
-                  return;
-                }
-              } else {
-                // 如果时间为空，查询字段不为空，那么直接将数据倾倒进来
-                this.queryResData = res.data;
               }
+              //  如果推进的数据为空，则提示唔该日期数据
+              if (this.queryResData.length == 0) {
+                if (this.choose_time != "" && this.choose_time != null) {
+                  this.$message.warning(`没有查到日期${this.choose_time}的数据`);
+                }
+                return;
+              }
+            } else {
+              // 如果时间为空，查询字段不为空，那么直接将数据倾倒进来
+              this.queryResData = res.data;
             }
-          })
-          .catch((err) => {
-            this.$message.error(err);
-          });
-      } else {
-        this.refreshFormSearch();
-      }
+          }
+        })
+        .catch((err) => {
+          this.$message.error(err);
+        });
+      //  }
+      //   else {
+      //   this.refreshFormSearch();
+      // }
     },
     // 刷新查询
     refreshFormSearch() {
       if (this.choose_time == null) {
         this.choose_time = "";
       }
+
       if (/^\d+$/.test(this.formData.customer_info)) {
         this.tradingReqUrl = "/api/query/getTradingByCustomerId";
         this.tradingReqData = { customer_id: this.formData.customer_info };
@@ -274,11 +278,11 @@ export default {
       })
         .then((res) => {
           console.log(res);
-        
-          if (res.data.length == 0 && (this.choose_time != "" || this.choose_time != null) ) {
+
+          if (res.data.length == 0 && (this.choose_time != "" || this.choose_time != null)) {
             this.$message.warning(`没有查到日期${this.choose_time}的数据`);
             return;
-          } else if (res.data.length == 0 && (this.choose_time == "" || this.choose_time == null) ) {
+          } else if (res.data.length == 0 && (this.choose_time == "" || this.choose_time == null)) {
             this.$message.warning("未查询到相关数据");
             return;
           }

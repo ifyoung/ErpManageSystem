@@ -11,15 +11,15 @@ var sqlMap = {
     getLocateCustomerId: `select customer_id from customer_info where LOCATE (?,customer_id) > 0`,
     getLocateCompanyName: `select company_name from customer_info where LOCATE (?,company_name) > 0`,
     // 依据客户id或者所属公司获取货物信息
-    getProductByCustomerId: `SELECT * FROM product where LOCATE (?,customer_id) > 0`,
+    getProductByCustomerId: `SELECT * FROM product p,customer_info c where p.customer_id=c.customer_id  LOCATE (?,customer_id) > 0`,
     getProductByCompanyName: `SELECT * FROM product p,customer_info c  where p.customer_id=c.customer_id and LOCATE (?,c.company_name) > 0`,
     // 获取所有货品信息
-    getAllProduct: `SELECT * FROM product`,
+    getAllProduct: `SELECT * FROM product p,customer_info c where p.customer_id = c.customer_id`,
     // 依据客户id或者所属公司获取 箱子 信息
-    getBoxByCustomerId: `SELECT * FROM box where LOCATE (?,customer_id) > 0`,
+    getBoxByCustomerId: `SELECT * FROM box b,customer_info c where b.customer_id = c.customer_id and LOCATE (?,customer_id) > 0`,
     getBoxByCompanyName: `SELECT * FROM box b,customer_info c  where b.customer_id=c.customer_id and LOCATE (?,c.company_name) > 0`,
     // 获取所有 箱子 信息
-    getAllBox: `SELECT * FROM box`,
+    getAllBox: `SELECT * FROM box b,customer_info c where b.customer_id = c.customer_id`,
     // 依据客户id或者所属公司获取客户 剩余金额 信息
     // 依据客户id或者所属公司获取客户 剩余金额 信息
     getLeaveAmountByCustomerId: `SELECT customer_id,leave_amount from customer_info where LOCATE (?,customer_id) > 0`,
@@ -28,17 +28,17 @@ var sqlMap = {
     getRechargeByCustomerId: `SELECT recharge_date,recharge_amount,real_amount from recharge_record where LOCATE (?,customer_id) > 0`,
     getRechargeByCompanyName: `SELECT recharge_date,recharge_amount,real_amount from recharge_record,customer_info c where LOCATE (?,c.company_name) > 0`,
     // 依据客户id或者所属公司获取客户 交易记录 信息
-    getTradingByCustomerId: `SELECT customer_id,trading_date,trading_amount,trading_content,status,trading_code from trading_record where LOCATE (?,customer_id) > 0`,
-    getTradingByCompanyName: `SELECT  customer_id,trading_date,trading_amount,trading_content,status,trading_code from trading_record,customer_info c where LOCATE (?,c.company_name) > 0`,
+    getTradingByCustomerId: `SELECT  c.customer_id,c.company_name,t.trading_code,t.trading_amount,t.trading_content,t.trading_date,t.status FROM  trading_record t,customer_info c where c.customer_id = t.customer_id and LOCATE (?,t.customer_id) > 0`,
+    getTradingByCompanyName: `SELECT  c.customer_id,c.company_name,t.trading_code,t.trading_amount,t.trading_content,t.trading_date,t.status FROM  trading_record t,customer_info c where c.customer_id = t.customer_id and LOCATE (?,c.company_name) > 0`,
     // 获取所有 交易 信息
-    getAllTrading: `SELECT * FROM trading_record`,
+    getAllTrading: `SELECT  c.customer_id,c.company_name,t.trading_code,t.trading_amount,t.trading_content,t.trading_date,t.status FROM  trading_record t,customer_info c where c.customer_id = t.customer_id`,
     // 查询是否有相同sku
     getSameSku: `Select * From product where customer_id = ? and product_name = ? and product_sku = ?`,
     // 依据客户id或者所属公司获取 出库记录 信息
-    getOutRecordByCustomerId: `SELECT * FROM out_record where LOCATE (?,customer_id) > 0`,
-    getOutRecordByCompanyName: `SELECT * FROM out_record o,customer_info c  where o.customer_id=c.customer_id and LOCATE (?,c.company_name) > 0`,
+    getOutRecordByCustomerId: `SELECT  c.customer_id,c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku FROM  out_record o,customer_info c where c.customer_id = o.customer_id  and where LOCATE (?,customer_id) > 0`,
+    getOutRecordByCompanyName: `SELECT  c.customer_id,c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku FROM  out_record o,customer_info c where c.customer_id = o.customer_id  and and LOCATE (?,c.company_name) > 0`,
     // 获取所有 出库记录 信息
-    getAllOutRecord: `SELECT * FROM out_record`,
+    getAllOutRecord: `SELECT  c.customer_id,c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku FROM  out_record o,customer_info c where c.customer_id = o.customer_id `,
   },
   insert: {
     insertCustomer: `INSERT INTO customer_info VALUES(?,?,?,?)`,

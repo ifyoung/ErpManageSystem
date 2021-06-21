@@ -32,16 +32,15 @@
           <el-table @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
-
+            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
             <el-table-column align="center" label="名称" prop="product_name"></el-table-column>
             <el-table-column align="center" label="规格(cm)" prop="length_width_height" width="120px"></el-table-column>
             <el-table-column align="center" label="重量(lb)" prop="weight"></el-table-column>
             <el-table-column align="center" label="仓储数量" prop="count"></el-table-column>
-
             <el-table-column align="center" label="入库时间" prop="come_time"></el-table-column>
             <el-table-column align="center" label="仓储天数" prop="save_days"></el-table-column>
             <el-table-column align="center" label="出库数量" prop="out_count"></el-table-column>
-            <el-table-column align="center" label="出库操作" width="220px">
+            <el-table-column align="center" label="出库操作" width="200px">
               <template slot-scope="scope">
                 <div class="sa-container">
                   <el-input placeholder="请输入" v-model="scope.row.operateCount"></el-input>
@@ -390,7 +389,7 @@ export default {
           data.out_time = getNowFormatDate();
 
           this.updateBox(data);
-          this.insertOutRecord(data,row);
+          this.insertOutRecord(data, row);
         })
         .catch((err) => {
           console.log(err);
@@ -413,8 +412,8 @@ export default {
     },
 
     // 添加 出库记录 信息
-    insertOutRecord(data,row) {
-       this.$http({
+    insertOutRecord(data, row) {
+      this.$http({
         method: "post",
         url: "api/insert/insertOutRecord",
         data: {
@@ -429,7 +428,7 @@ export default {
           console.log("添加箱子出库记录信息成功");
         })
         .catch((err) => {});
-    }
+    },
   },
   watch: {
     formData: {
