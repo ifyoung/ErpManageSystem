@@ -30,7 +30,7 @@
       <el-row style="padding-top:20px">
         <el-col class="customer-table" :span="24">
           <el-table height="455" @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
-            <el-table-column align="center" type="selection" width="100px"></el-table-column>
+            <!-- <el-table-column align="center" type="selection" width="100px"></el-table-column> -->
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
                <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
             <el-table-column align="center" label="货品名称" prop="product_name" width="150px"></el-table-column>
