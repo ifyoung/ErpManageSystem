@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ErpManageSystem
 Erp海外仓系统，第一次为别人做项目，用到的技术很简单，Express、Vue、ElementUI、MySql
 
@@ -13,3 +14,24 @@ npm run build 打包项目
 
 # 最后
 希望喜欢的或者觉得还不错的朋友点一点star，谢谢
+=======
+# storage
+
+## Project setup
+```
+npm install
+```
+
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
+
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
+>>>>>>> 29043a16b1acd44cca39841a926b06ffb56979e8

@@ -1,0 +1,54 @@
+{
+  "name": "storage",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "n": "node F:/宝塔_node/storageManager/storage/src/server ",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
+    "core-js": "^3.11.2",
+    "element-ui": "^2.15.1",
+    "express": "^4.17.1",
+    "http-proxy-middleware": "^2.0.0",
+    "less-loader": "^4.1.0",
+    "mysql": "^2.18.1",
+    "postcss-pxtorem": "^5.1.1",
+    "vue": "^2.6.12",
+    "vue-loader": "^15.9.7",
+    "vue-router": "^3.5.1",
+    "vuex": "^3.6.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^4.5.12",
+    "@vue/cli-plugin-router": "^4.5.12",
+    "@vue/cli-plugin-vuex": "^4.5.12",
+    "@vue/cli-service": "^4.5.12",
+    "babel-plugin-component": "^1.1.1",
+    "less": "^2.7.3",
+    "postcss-px-to-viewport": "^1.1.1",
+    "vue-template-compiler": "^2.6.12"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {},
+      "postcss-pxtorem": {
+        "rootValue": 16,
+        "propList": [
+          "*"
+        ],
+        "selectorBlackList": [
+          "van-"
+        ]
+      }
+    }
+  }
+}
