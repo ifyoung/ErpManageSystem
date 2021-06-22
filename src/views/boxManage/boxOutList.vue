@@ -35,8 +35,8 @@
             <el-table-column align="center" label="名称" prop="product_name" width="200px"></el-table-column>
             <el-table-column align="center" label="规格(cm)" prop="length_width_height" width="150px"></el-table-column>
             <el-table-column align="center" label="重量(lb)" prop="weight"></el-table-column>
-            <el-table-column align="center" label="入库时间" prop="come_time"></el-table-column>
-            <el-table-column align="center" label="出库时间" prop="out_time"></el-table-column>
+            <el-table-column align="center" label="入库时间" prop="come_time" width="100px"></el-table-column>
+            <el-table-column align="center" label="出库时间" prop="out_time" width="100px"></el-table-column>
             <el-table-column align="center" label="初始数量" prop="count"></el-table-column>
             <el-table-column align="center" label="仓储天数" prop="save_days"></el-table-column>
             <el-table-column align="center" label="出库数量" prop="out_count"></el-table-column>

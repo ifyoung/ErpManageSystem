@@ -36,7 +36,7 @@
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
                <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
-            <el-table-column align="center" label="入库时间" prop="come_time"></el-table-column>
+            <el-table-column align="center" label="入库时间" prop="come_time" width="100px"></el-table-column>
             <el-table-column align="center" label="货品名称" prop="product_name"></el-table-column>
             <el-table-column align="center" label="货品SKU" prop="product_sku"></el-table-column>
             <el-table-column align="center" label="数量" prop="storage_count"></el-table-column>

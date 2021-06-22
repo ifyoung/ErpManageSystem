@@ -38,7 +38,7 @@
             <el-table-column align="center" label="抛重重量(lb)" prop="weight" width="150px"></el-table-column>
             <el-table-column align="center" label="实际重量(lb)" prop="real_weight" width="150px"></el-table-column>
             <el-table-column align="center" label="仓储数量" prop="count"></el-table-column>
-            <el-table-column align="center" label="入库时间" prop="come_time"></el-table-column>
+            <el-table-column align="center" label="入库时间" prop="come_time" width="100px"></el-table-column>
             <el-table-column align="center" label="仓储天数" prop="save_days"></el-table-column>
           </el-table>
         </el-col>
