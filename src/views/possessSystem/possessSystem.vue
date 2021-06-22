@@ -287,7 +287,7 @@ this.loading = true
       })
         .then((res) => {
           console.log(res);
-
+		this.loading = false;
           if (res.data.length == 0 && (this.choose_time != "" || this.choose_time != null)) {
             this.$message.warning(`没有查到日期${this.choose_time}的数据`);
             return;
