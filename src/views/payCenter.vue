@@ -423,7 +423,7 @@ export default {
         data: this.tradingReqData,
       })
         .then((res) => {
-          // this.loading = false;
+          this.loading = false;
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));

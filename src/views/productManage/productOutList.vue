@@ -218,11 +218,13 @@ export default {
     },
     // 获取所有的货品信息,不提示查询成功
     refresh() {
+         this.loading = true
       this.$http({
         method: "post",
         url: "/api/query/getAllProduct",
       })
         .then((res) => {
+             this.loading = false
           for (let item of res.data) {
             let come = Date.parse(new Date(item.come_time));
             let today = Date.parse(new Date(this.today_date));
