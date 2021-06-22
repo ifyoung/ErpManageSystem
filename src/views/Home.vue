@@ -28,9 +28,9 @@ export default {
   },
   mounted() {
     let _this = this;
-    _this.app_height = window.document.documentElement.offsetHeight * 0.958;
+    _this.app_height = window.document.documentElement.offsetHeight * 0.926;
     window.onresize = function() {
-      _this.app_height = window.document.documentElement.offsetHeight * 0.958;
+      _this.app_height = window.document.documentElement.offsetHeight * 0.926;
     };
     
 
