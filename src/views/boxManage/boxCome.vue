@@ -31,10 +31,23 @@
       </el-row>
       <el-row style="padding-top:20px">
         <el-col class="customer-table" :span="24">
-          <el-table  height="455" @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
+          <el-table
+            height="455"
+            v-loading="loading"
+            element-loading-text="加载中..."
+            element-loading-custom-class="loading_color"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.5)"
+            @selection-change="handleSelectionChange"
+            :row-style="showRow"
+            border
+            stripe
+            :data="computedQueryResData"
+            ref="multipleTable"
+          >
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
             <el-table-column align="center" label="客户编号" prop="customer_id" width="150px"></el-table-column>
-               <el-table-column align="center" label="公司名称" prop="company_name" width="150px"></el-table-column>
+            <el-table-column align="center" label="公司名称" prop="company_name" width="150px"></el-table-column>
             <el-table-column align="center" label="入库时间" prop="come_time" width="200px"></el-table-column>
             <el-table-column align="center" label="名称" prop="product_name" width="200px"></el-table-column>
             <el-table-column align="center" label="规格(cm)" prop="length_width_height" width="150px"></el-table-column>
@@ -154,6 +167,7 @@ export default {
     return {
       times: 0, // 监听计数
       timer: null,
+      loading: false, // 加载标识，默认为false,当调用接口时赋值为true
       today_date: "", // 今天的日期
       isDel: true, // 删除禁用
       multipleSelection: [], // 勾选列表
@@ -289,12 +303,14 @@ export default {
 
     // 获取箱子信息
     getBox() {
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.boxReqUrl,
         data: this.boxReqData,
       })
         .then((res) => {
+          this.loading = false;
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -329,13 +345,14 @@ export default {
         this.boxReqUrl = "/api/query/getBoxByCompanyName";
         this.boxReqData = { company_name: this.formData.customer_info };
       }
-
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.boxReqUrl,
         data: this.boxReqData,
       })
         .then((res) => {
+          this.loading = false;
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));

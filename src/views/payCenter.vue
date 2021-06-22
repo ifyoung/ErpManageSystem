@@ -29,7 +29,19 @@
 
       <el-row style="padding-top:5px;">
         <el-col class="customer-table" :span="24">
-          <el-table height="455" @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="queryResData_trading_pagination">
+          <el-table
+            height="455"
+            v-loading="loading"
+            element-loading-text="加载中..."
+            element-loading-custom-class="loading_color"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.5)"
+            @selection-change="handleSelectionChange"
+            :row-style="showRow"
+            border
+            stripe
+            :data="queryResData_trading_pagination"
+          >
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
             <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
@@ -200,6 +212,7 @@ export default {
     return {
       times: 0, // 监听计数
       timer: null,
+      loading: false, // 加载标识，默认为false,当调用接口时赋值为true
       isDel: true,
       isModify: true,
       multipleSelection: [], // 勾选列表
@@ -343,15 +356,16 @@ export default {
     },
     // 获取交易信息的接口方法
     getTrading() {
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.tradingReqUrl,
         data: this.tradingReqData,
       })
         .then((res) => {
+          this.loading = false;
           if (res.data.length != 0) {
             this.$message.success("查询成功");
-
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
               let today = Date.parse(new Date(this.today_date));
@@ -402,12 +416,14 @@ export default {
     },
     // 刷新获取交易信息
     refreshGetTrading() {
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.tradingReqUrl,
         data: this.tradingReqData,
       })
         .then((res) => {
+          // this.loading = false;
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
@@ -635,4 +651,6 @@ export default {
     padding-left: 20px;
   }
 }
+
+
 </style>

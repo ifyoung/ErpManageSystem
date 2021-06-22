@@ -28,7 +28,13 @@
       </el-row>
       <el-row style="padding-top:20px">
         <el-col class="customer-table" :span="24">
-          <el-table height="455" @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
+             <el-table height="455"
+            v-loading="loading"
+            element-loading-text="加载中..."
+            element-loading-custom-class="loading_color"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.5)"
+           @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
             <!-- <el-table-column align="center" type="selection" width="100px"></el-table-column> -->
             <el-table-column align="center" label="客户编号" prop="customer_id" width="150px"></el-table-column>
                <el-table-column align="center" label="公司名称" prop="company_name" width="150px"></el-table-column>
@@ -77,6 +83,7 @@ export default {
     return {
       times: 0, // 监听计数
       timer: null,
+        loading:false, // 加载标识，默认为false,当调用接口时赋值为true
       productReqUrl: "", // 货品信息请求地址
       productReqData: {}, // 货品信息提交数据
       locateReqUrl: "/api/query/getLocateCustomerId", // 模糊查询地址
@@ -149,12 +156,14 @@ export default {
 
     // 获取指定查询的货品信息
     getProduct() {
+      this.loading = true
       this.$http({
         method: "post",
         url: this.productReqUrl,
         data: this.productReqData,
       })
         .then((res) => {
+          this.loading = false
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -179,11 +188,13 @@ export default {
 
     // 获取所有的货品信息
     getAllProduct() {
+      this.loading = true
       this.$http({
         method: "post",
         url: "/api/query/getAllProduct",
       })
         .then((res) => {
+          this.loading = false
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {

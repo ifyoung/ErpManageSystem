@@ -40,10 +40,12 @@ import {
   CarouselItem,
   Breadcrumb,
   BreadcrumbItem,
+  Loading,
 } from "element-ui";
 const element = {
   install: function(Vue) {
-    Vue.use(Autocomplete)
+    Vue.use(Autocomplete);
+    Vue.use(Loading);
     Vue.use(BreadcrumbItem);
     Vue.use(Breadcrumb);
     Vue.use(Select);
