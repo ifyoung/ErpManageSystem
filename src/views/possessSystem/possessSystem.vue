@@ -4,7 +4,7 @@
       <h1>财务系统</h1>
     </div>
     <div class="content-container">
-      <el-row style="padding-top:20px">
+      <el-row >
         <el-col style="width:31%">
           <el-form :model="formData" ref="formData" label-width="120px" label-position="left">
             <el-form-item label="客户信息" prop="customer_info">
@@ -40,7 +40,7 @@
         </el-col>
       </el-row>
 
-      <el-row style="padding-top:20px">
+      <el-row style="padding-top:5px">
         <el-col class="customer-table" :span="20">
              <el-table height="455"
             v-loading="loading"

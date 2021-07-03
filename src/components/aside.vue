@@ -3,16 +3,18 @@
     <el-row class="height_percent_100">
       <el-col :span="24" class="height_percent_100">
         <div class="aside-title">ERP系统</div>
-        <div class= "user-container">
-          <div style="display:inline-block">用户:{{ this.userName }}</div>
-          <span style="margin-left:20px"> 身份:{{ this.userLevel }}</span>
-          <div style="display:inline-block;margin-left:10%;transform:translateY(-2.5px)">
-            <el-link type="success" class="el-icon-s-custom" @click="exit">登出</el-link>
-          </div>
+        <div class="user-container">
+          <el-row style="width:240px">
+            <el-col :span="15">
+              <div style="display:inline-block;padding-left:12px">用户:{{ this.userName }}</div>
+              <br />
+              <span style="padding-left:12px"> 身份:{{ this.userLevel }}</span>
+            </el-col>
+            <div class="exit-container">
+              <el-link class="el-icon-s-custom" @click="exit">退出</el-link>
+            </div>
+          </el-row>
         </div>
-
-        
-        
 
         <el-menu
           :default-active="this.$router.path"
@@ -147,11 +149,49 @@ export default {
       background-color: rgb(48, 47, 47) !important;
     }
   }
+  /deep/ .el-menu-item:focus,
+  .el-menu-item.is-active,
+  .el-menu-item:hover {
+    outline: 0;
+    color: black !important;
+  }
+
+  /deep/ .el-submenu.is-opened .el-submenu__title {
+    outline: 0;
+    color: rgb(247, 204, 112) !important;
+  }
+
+  /deep/ .aside-menu[data-v-9b999550] .el-submenu .el-menu-item:focus,
+  .aside-menu[data-v-9b999550] .el-submenu .el-menu-item:hover,
+   .aside-menu[data-v-9b999550] .el-submenu .el-menu-item.is-active,
+  .el-menu-item.is-active,
+  .el-menu-item:hover {
+    outline: 0;
+    color: rgb(126, 97, 1) !important;
+    background-color: #f0e19f !important;
+  }
 }
-.user-container{
-  display:flex;
-  justify-content: center;
-  align-items: center;
+.user-container {
+  display: flex;
   background-color: antiquewhite;
+}
+.exit-container {
+  transform: translateY(9px);
+
+  .el-link {
+    font-size: 17px !important;
+    background-color: #f0e19f;
+    color: #976d01;
+    // border:0.1px solid black;
+    box-shadow: 1.5px 2px 5px gray;
+    border-radius: 7px;
+    width: 65px;
+    height: 25px;
+
+    &:hover {
+      background-color: rgb(192, 35, 8);
+      color: white;
+    }
+  }
 }
 </style>
