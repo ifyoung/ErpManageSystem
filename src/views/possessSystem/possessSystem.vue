@@ -9,7 +9,7 @@
           <el-form :model="formData" ref="formData" label-width="120px" label-position="left">
             <el-form-item label="客户信息" prop="customer_info">
               <el-autocomplete
-                style="width:255px;"
+                  style="width:100%"
                 v-model="formData.customer_info"
                 :fetch-suggestions="querySearch"
                 clearable

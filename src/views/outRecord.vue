@@ -20,7 +20,7 @@
             </el-form-item>
           </el-form>
         </el-col>
-        <el-col style="margin-left:30px;" :span="2">
+        <el-col style="margin-left:10px;" :span="2">
           <el-button type="primary" @click="formSearch">查询</el-button>
         </el-col>
         <el-col :span="2">

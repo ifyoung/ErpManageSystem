@@ -29,7 +29,7 @@
         >
           <el-menu-item index="/noticeCenter">
             <i class="el-icon-message-solid"></i>
-            <span class="menu-title">通知中心</span>
+            <span class="menu-title">订单中心</span>
           </el-menu-item>
           <el-menu-item index="/payCenter">
             <i class="el-icon-bank-card"></i>
@@ -40,7 +40,7 @@
             <span class="menu-title">客户管理</span>
           </el-menu-item>
           <el-menu-item index="/possessSystem">
-            <i style="padding-left:4px;padding-right:13px;font-size:19px;">$</i>
+            <i style="padding-left:5px;padding-right:16.9px;font-size:19px;">$</i>
             <span class="menu-title">财务系统</span>
           </el-menu-item>
           <el-menu-item index="/outRecord">
@@ -126,8 +126,8 @@ export default {
     padding: 5px 0px;
     font-size: 30px;
     text-align: center;
-    background-color: rgba(226, 148, 3, 0.993);
-    color: rgb(255, 254, 254);
+    background-color: rgba(253, 221, 37, 0.836);
+    color: rgb(0, 0, 0);
   }
   .aside-menu {
     font-size: 20px;
@@ -163,12 +163,13 @@ export default {
 
   /deep/ .aside-menu[data-v-9b999550] .el-submenu .el-menu-item:focus,
   .aside-menu[data-v-9b999550] .el-submenu .el-menu-item:hover,
-   .aside-menu[data-v-9b999550] .el-submenu .el-menu-item.is-active,
+  .aside-menu[data-v-9b999550] .el-submenu .el-menu-item.is-active,
   .el-menu-item.is-active,
   .el-menu-item:hover {
     outline: 0;
     color: rgb(126, 97, 1) !important;
     background-color: #f0e19f !important;
+    border-bottom: 1px solid rgba(29, 3, 3, 0.575);
   }
 }
 .user-container {
