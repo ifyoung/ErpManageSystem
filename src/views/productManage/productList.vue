@@ -10,7 +10,7 @@
           <el-form :model="formData" ref="formData" label-width="100px" label-position="left">
             <el-form-item label="客户信息:" prop="customer_info">
               <el-autocomplete
-                 style="width:100%"
+                style="width:100%"
                 v-model="formData.customer_info"
                 :fetch-suggestions="querySearch"
                 clearable
@@ -49,7 +49,8 @@
             <el-table-column align="center" label="货品名称" prop="product_name"></el-table-column>
             <el-table-column align="center" label="货品SKU" prop="product_sku"></el-table-column>
             <el-table-column align="center" label="入库时间" prop="come_time" width="100px"></el-table-column>
-            <el-table-column align="center" label="数量" prop="storage_count"></el-table-column>
+            <el-table-column align="center" label="入仓数量" prop="storage_count"></el-table-column>
+              <el-table-column align="center" label="剩余数量" prop="leave_count"></el-table-column>
             <el-table-column align="center" label="仓储天数" prop="save_days"></el-table-column>
           </el-table>
         </el-col>
@@ -161,7 +162,7 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.productReqUrl = "/api/query/getProductByCustomerId";
         this.productReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -186,10 +187,10 @@ export default {
               let today = Date.parse(new Date(this.today_date));
               var day = parseInt((today - come) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
               item.save_days = day;
-
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+              item.leave_count = Number(item.storage_count) - Number(item.out_count);
             }
             this.queryResData = res.data;
           } else {
@@ -203,7 +204,7 @@ export default {
 
     // 查询
     refreshFormSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.productReqUrl = "/api/query/getProductByCustomerId";
         this.productReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -220,6 +221,7 @@ export default {
         data: this.productReqData,
       })
         .then((res) => {
+          console.log(res);
           this.loading = false;
           if (res.data.length != 0) {
             for (let item of res.data) {
@@ -230,6 +232,8 @@ export default {
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+
+              item.leave_count = Number(item.storage_count) - Number(item.out_count);
             }
             this.queryResData = res.data;
           }
@@ -313,7 +317,7 @@ export default {
     formData: {
       handler: function(nV, oV) {
         // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/^\d+$/.test(this.formData.customer_info)) {
+        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
           this.locateReqUrl = "/api/query/getLocateCustomerId";
           this.locateReqData = { customer_id: nV.customer_info };
         } else {

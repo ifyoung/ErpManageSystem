@@ -10,7 +10,7 @@
           <el-form :model="formData" ref="formData" label-width="100px" label-position="left">
             <el-form-item label="客户信息:" prop="customer_info">
               <el-autocomplete
-               style="width:100%"
+                style="width:100%"
                 v-model="formData.customer_info"
                 :fetch-suggestions="querySearch"
                 clearable
@@ -29,21 +29,29 @@
       </el-row>
       <el-row style="padding-top:20px">
         <el-col class="customer-table" :span="24">
-             <el-table height="455"
+          <el-table
+            height="455"
             v-loading="loading"
             element-loading-text="加载中..."
             element-loading-custom-class="loading_color"
             element-loading-spinner="el-icon-loading"
             element-loading-background="rgba(0, 0, 0, 0.5)"
-           @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
+            @selection-change="handleSelectionChange"
+            :row-style="showRow"
+            border
+            stripe
+            :data="computedQueryResData"
+            ref="multipleTable"
+          >
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
             <el-table-column align="center" label="客户编号" prop="customer_id" width="150px"></el-table-column>
-   <el-table-column align="center" label="公司名称" prop="company_name" width="150px"></el-table-column>
+            <el-table-column align="center" label="公司名称" prop="company_name" width="150px"></el-table-column>
             <el-table-column align="center" label="名称" prop="product_name" width="200px"></el-table-column>
             <el-table-column align="center" label="规格(cm)" prop="length_width_height" width="150px"></el-table-column>
             <el-table-column align="center" label="抛重重量(lb)" prop="weight" width="150px"></el-table-column>
             <el-table-column align="center" label="实际重量(lb)" prop="real_weight" width="150px"></el-table-column>
-            <el-table-column align="center" label="仓储数量" prop="count"></el-table-column>
+            <el-table-column align="center" label="入仓数量" prop="count"></el-table-column>
+            <el-table-column align="center" label="剩余数量" prop="leave_count"></el-table-column>
             <el-table-column align="center" label="入库时间" prop="come_time" width="100px"></el-table-column>
             <el-table-column align="center" label="仓储天数" prop="save_days"></el-table-column>
           </el-table>
@@ -81,7 +89,7 @@ export default {
     return {
       times: 0, // 监听计数
       timer: null,
-        loading:false, // 加载标识，默认为false,当调用接口时赋值为true
+      loading: false, // 加载标识，默认为false,当调用接口时赋值为true
       today_date: "", // 今天的日期
       isDel: true, // 删除禁用
       multipleSelection: [], // 勾选列表
@@ -174,7 +182,7 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.boxReqUrl = "/api/query/getBoxByCustomerId";
         this.boxReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -189,7 +197,7 @@ export default {
 
     // 刷新查询
     refreshFormSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.boxReqUrl = "/api/query/getBoxByCustomerId";
         this.boxReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -203,14 +211,14 @@ export default {
     },
     // 获取箱子信息
     getBox() {
-      this.loading = true
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.boxReqUrl,
         data: this.boxReqData,
       })
         .then((res) => {
-          this.loading = false
+          this.loading = false;
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -222,6 +230,7 @@ export default {
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+              item.leave_count = Number(item.count) - Number(item.out_count);
             }
             this.queryResData = res.data;
           } else {
@@ -234,14 +243,15 @@ export default {
     },
     // 刷新箱子信息列表
     refreshGetBox() {
-      this.loading = true
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.boxReqUrl,
         data: this.boxReqData,
       })
         .then((res) => {
-          this.loading = false
+          this.loading = false;
+          console.log(res);
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
@@ -252,6 +262,7 @@ export default {
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+              item.leave_count = Number(item.count) - Number(item.out_count);
             }
             this.queryResData = res.data;
           }
@@ -386,7 +397,7 @@ export default {
     formData: {
       handler: function(nV, oV) {
         // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/^\d+$/.test(this.formData.customer_info)) {
+        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
           this.locateReqUrl = "/api/query/getLocateCustomerId";
           this.locateReqData = { customer_id: nV.customer_info };
         } else {

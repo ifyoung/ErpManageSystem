@@ -122,4 +122,39 @@ router.post("/updateUser", (req, res) => {
   });
 });
 
+// 更新箱子信息
+router.post("/updateOutRecordWithBox", (req, res) => {
+  var sql = $sql.update.updateOutRecordWithBox;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_id, parms.product_name, parms.out_count, parms.product_sku], function(err, result) {
+    if (err) {
+      console.log(err);
+      // console.log(store.state.sql.sqlState)
+      console.log("报错了天哪");
+    }
+    if (result) {
+      jsonWrite(res, result);
+    }
+  });
+});
+
+
+// 更新货物信息
+router.post("/updateOutRecordWithProduct", (req, res) => {
+  var sql = $sql.update.updateOutRecordWithProduct;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_id, parms.product_name, parms.out_count, parms.product_sku], function(err, result) {
+    if (err) {
+      console.log(err);
+      // console.log(store.state.sql.sqlState)
+      console.log("报错了天哪");
+    }
+    if (result) {
+      jsonWrite(res, result);
+    }
+  });
+});
+module.e
 module.exports = router;

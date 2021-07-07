@@ -273,10 +273,10 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.boxReqUrl = "/api/query/getBoxByCustomerId";
         this.boxReqData = { customer_id: this.formData.customer_info };
-      } else if ((this.formData.customer_info = "")) {
+      } else if (this.formData.customer_info == "") {
         this.boxReqUrl = "/api/query/getAllBox";
         this.boxReqData = {};
       } else {
@@ -288,10 +288,10 @@ export default {
 
     // 查询
     refreshFormSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.boxReqUrl = "/api/query/getBoxByCustomerId";
         this.boxReqData = { customer_id: this.formData.customer_info };
-      } else if ((this.formData.customer_info = "")) {
+      } else if (this.formData.customer_info == "") {
         this.boxReqUrl = "/api/query/getAllBox";
         this.boxReqData = {};
       } else {
@@ -323,7 +323,7 @@ export default {
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
             }
-
+            console.log(res.data)
             this.queryResData = res.data;
           } else {
             this.$message.warning("未查询到相关数据");
@@ -335,17 +335,19 @@ export default {
     },
     // 刷新箱子信息列表
     refreshGetBox() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.boxReqUrl = "/api/query/getBoxByCustomerId";
         this.boxReqData = { customer_id: this.formData.customer_info };
-      } else if ((this.formData.customer_info = "")) {
+      } else if (this.formData.customer_info == "") {
         this.boxReqUrl = "/api/query/getAllBox";
-        this.boxReqData = { o };
+        this.boxReqData = {  };
       } else {
         this.boxReqUrl = "/api/query/getBoxByCompanyName";
         this.boxReqData = { company_name: this.formData.customer_info };
       }
       this.loading = true;
+      console.log(this.boxReqUrl)
+       console.log(this.boxReqData)
       this.$http({
         method: "post",
         url: this.boxReqUrl,
@@ -498,7 +500,7 @@ export default {
     formData: {
       handler: function(nV, oV) {
         // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/^\d+$/.test(this.formData.customer_info)) {
+        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
           this.locateReqUrl = "/api/query/getLocateCustomerId";
           this.locateReqData = { customer_id: nV.customer_info };
         } else {

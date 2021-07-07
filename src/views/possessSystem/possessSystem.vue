@@ -4,12 +4,12 @@
       <h1>财务系统</h1>
     </div>
     <div class="content-container">
-      <el-row >
+      <el-row>
         <el-col style="width:31%">
           <el-form :model="formData" ref="formData" label-width="120px" label-position="left">
             <el-form-item label="客户信息" prop="customer_info">
               <el-autocomplete
-                  style="width:100%"
+                style="width:100%"
                 v-model="formData.customer_info"
                 :fetch-suggestions="querySearch"
                 clearable
@@ -42,13 +42,20 @@
 
       <el-row style="padding-top:5px">
         <el-col class="customer-table" :span="20">
-             <el-table height="455"
+          <el-table
+            height="455"
             v-loading="loading"
             element-loading-text="加载中..."
             element-loading-custom-class="loading_color"
             element-loading-spinner="el-icon-loading"
             element-loading-background="rgba(0, 0, 0, 0.5)"
-           @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
+            @selection-change="handleSelectionChange"
+            :row-style="showRow"
+            border
+            stripe
+            :data="computedQueryResData"
+            ref="multipleTable"
+          >
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
             <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
             <el-table-column align="center" label="日期" prop="trading_date"></el-table-column>
@@ -82,7 +89,7 @@ import { utcToCst } from "../../utils/utcToCst";
 export default {
   data() {
     return {
-        loading:false, // 加载标识，默认为false,当调用接口时赋值为true
+      loading: false, // 加载标识，默认为false,当调用接口时赋值为true
       queryPage: {
         pageSize: 10,
         currentPage: 1,
@@ -195,7 +202,7 @@ export default {
         this.choose_time = "";
       }
 
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.tradingReqUrl = "/api/query/getTradingByCustomerId";
         this.tradingReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -205,7 +212,7 @@ export default {
         this.tradingReqUrl = "/api/query/getTradingByCompanyName";
         this.tradingReqData = { company_name: this.formData.customer_info };
       }
-this.loading = true
+      this.loading = true;
 
       // if (this.choose_time != "" || this.choose_time != null) {
       this.$http({
@@ -269,7 +276,7 @@ this.loading = true
         this.choose_time = "";
       }
 
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.tradingReqUrl = "/api/query/getTradingByCustomerId";
         this.tradingReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -279,7 +286,7 @@ this.loading = true
         this.tradingReqUrl = "/api/query/getTradingByCompanyName";
         this.tradingReqData = { company_name: this.formData.customer_info };
       }
-this.loading = true
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.tradingReqUrl,
@@ -287,7 +294,7 @@ this.loading = true
       })
         .then((res) => {
           console.log(res);
-		this.loading = false;
+          this.loading = false;
           if (res.data.length == 0 && (this.choose_time != "" || this.choose_time != null)) {
             this.$message.warning(`没有查到日期${this.choose_time}的数据`);
             return;
@@ -295,7 +302,7 @@ this.loading = true
             this.$message.warning("未查询到相关数据");
             return;
           }
-this.loading = false;
+          this.loading = false;
           if (res.data.length != 0) {
             for (let item of res.data) {
               item.trading_date = utcToCst(item.trading_date)
@@ -341,7 +348,7 @@ this.loading = false;
     formData: {
       handler: function(nV, oV) {
         // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/^\d+$/.test(this.formData.customer_info)) {
+        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
           this.locateReqUrl = "/api/query/getLocateCustomerId";
           this.locateReqData = { customer_id: nV.customer_info };
         } else {

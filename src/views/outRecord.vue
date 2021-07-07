@@ -144,7 +144,7 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.outRecordReqUrl = "/api/query/getOutRecordByCustomerId";
         this.outRecordReqData = { customer_id: this.formData.customer_info };
         this.getOutRecord();
@@ -244,6 +244,7 @@ export default {
         .then(() => {
           this.solidSelection = this.multipleSelection;
           while (this.solidSelection.length != 0) {
+            this.withdrawOutRecord();
             this.deleteOutRecord();
             this.solidSelection.shift();
           }
@@ -273,10 +274,33 @@ export default {
           this.$message.error(err);
         });
     },
+    // 撤回 出库记录 信息
+    withdrawOutRecord() {
+      let url = "api/update/updateOutRecordWithBox";
+      if (this.solidSelection[0].product_sku != "---") {
+        url = "api/update/updateOutRecordWithProduct";
+      }
 
+      this.$http({
+        method: "post",
+        url: url,
+        data: {
+          customer_id: this.solidSelection[0].customer_id,
+          product_name: this.solidSelection[0].product_name,
+          product_sku: this.solidSelection[0].product_sku,
+          out_count: this.solidSelection[0].out_count,
+        },
+      })
+        .then((res) => {
+          this.refreshGetAllOutRecord();
+        })
+        .catch((err) => {
+          this.$message.error(err);
+        });
+    },
     // 查询
     refreshFormSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.boxReqUrl = "/api/query/getBoxByCustomerId";
         this.boxReqData = { customer_id: this.formData.customer_info };
       } else if ((this.formData.customer_info = "")) {
@@ -323,7 +347,7 @@ export default {
     formData: {
       handler: function(nV, oV) {
         // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/^\d+$/.test(this.formData.customer_info)) {
+        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
           this.locateReqUrl = "/api/query/getLocateCustomerId";
           this.locateReqData = { customer_id: nV.customer_info };
         } else {

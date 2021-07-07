@@ -179,7 +179,7 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.boxReqUrl = "/api/query/getBoxByCustomerId";
         this.boxReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -227,7 +227,7 @@ export default {
 
     // 刷新箱子信息列表
     refreshGetBox() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.boxReqUrl = "/api/query/getBoxByCustomerId";
         this.boxReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -444,7 +444,7 @@ this.loading = true
     formData: {
       handler: function(nV, oV) {
         // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/^\d+$/.test(this.formData.customer_info)) {
+        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
           this.locateReqUrl = "/api/query/getLocateCustomerId";
           this.locateReqData = { customer_id: nV.customer_info };
         } else {
