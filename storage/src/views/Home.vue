@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <el-row>
-      <el-col   :style="{ height: app_height + 'px',width:'20%'}">
+      <el-col   :style="{ height: app_height + 'px',width:'17%'}">
         <Aside></Aside>
       </el-col>
-      <el-col style="width:80%">
+      <el-col style="width:83%">
         <Main></Main>
       </el-col>
     </el-row>
@@ -13,6 +13,7 @@
 
 <script>
 import Aside from "../components/aside.vue";
+
 import Main from "../components/main.vue";
 export default {
   name: "Home",
@@ -27,9 +28,9 @@ export default {
   },
   mounted() {
     let _this = this;
-    _this.app_height = window.document.documentElement.offsetHeight * 0.92;
+    _this.app_height = window.document.documentElement.offsetHeight * 0.89;
     window.onresize = function() {
-      _this.app_height = window.document.documentElement.offsetHeight * 0.92;
+      _this.app_height = window.document.documentElement.offsetHeight * 0.89;
     };
     
 

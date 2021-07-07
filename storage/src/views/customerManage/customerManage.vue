@@ -6,7 +6,14 @@
     <div class="content-container">
       <el-row>
         <el-col class="customer-table" :span="14">
-          <el-table @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedqueryResData" ref="multipleTable">
+          <el-table
+           height="435"
+            v-loading="loading"
+            element-loading-text="加载中..."
+            element-loading-custom-class="loading_color"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.5)"
+           @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedqueryResData" ref="multipleTable">
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
             <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
@@ -81,6 +88,7 @@ export default {
     return {
       addDV: false, // 是否开启添加的会话框
       isDel: true, // 是否禁用删除按键
+      loading:false, // 是否加载
       queryPage: {
         pageSize: 10,
         currentPage: 1,
@@ -137,10 +145,12 @@ export default {
     },
     // 刷新客户信息表但不提示
     refreshGetCustomer() {
+      this.loading = true
       this.$http({
         method: "get",
         url: "api/query/getCustomer",
       }).then((res) => {
+        this.loading=false;
         if (res.data.length != 0) {
           for (let item of res.data) {
             item.first_come_time = utcToCst(item.first_come_time)

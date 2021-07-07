@@ -4,12 +4,12 @@
       <h1>财务系统</h1>
     </div>
     <div class="content-container">
-      <el-row style="padding-top:20px">
+      <el-row>
         <el-col style="width:31%">
           <el-form :model="formData" ref="formData" label-width="120px" label-position="left">
             <el-form-item label="客户信息" prop="customer_info">
               <el-autocomplete
-                style="width:255px;"
+                style="width:100%"
                 v-model="formData.customer_info"
                 :fetch-suggestions="querySearch"
                 clearable
@@ -40,10 +40,24 @@
         </el-col>
       </el-row>
 
-      <el-row style="padding-top:20px">
+      <el-row style="padding-top:5px">
         <el-col class="customer-table" :span="20">
-          <el-table @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
+          <el-table
+            height="445"
+            v-loading="loading"
+            element-loading-text="加载中..."
+            element-loading-custom-class="loading_color"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.5)"
+            @selection-change="handleSelectionChange"
+            :row-style="showRow"
+            border
+            stripe
+            :data="computedQueryResData"
+            ref="multipleTable"
+          >
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
+            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
             <el-table-column align="center" label="日期" prop="trading_date"></el-table-column>
             <el-table-column align="center" label="内容" prop="trading_content"></el-table-column>
             <el-table-column align="center" label="金额" prop="trading_amount"></el-table-column>
@@ -75,6 +89,7 @@ import { utcToCst } from "../../utils/utcToCst";
 export default {
   data() {
     return {
+      loading: false, // 加载标识，默认为false,当调用接口时赋值为true
       queryPage: {
         pageSize: 10,
         currentPage: 1,
@@ -187,7 +202,7 @@ export default {
         this.choose_time = "";
       }
 
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.tradingReqUrl = "/api/query/getTradingByCustomerId";
         this.tradingReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -197,66 +212,71 @@ export default {
         this.tradingReqUrl = "/api/query/getTradingByCompanyName";
         this.tradingReqData = { company_name: this.formData.customer_info };
       }
+      this.loading = true;
 
-      if (this.choose_time != "") {
-        this.$http({
-          method: "post",
-          url: this.tradingReqUrl,
-          data: this.tradingReqData,
-        })
-          .then((res) => {
-            if (res.data.length == 0 && this.choose_time != "") {
-              this.$message.warning(`没有查到日期${this.choose_time}的数据`);
-              return;
-            } else if (res.data.length == 0 && this.choose_time == "") {
-              this.$message.warning("未查询到相关数据");
-              return;
+      // if (this.choose_time != "" || this.choose_time != null) {
+      this.$http({
+        method: "post",
+        url: this.tradingReqUrl,
+        data: this.tradingReqData,
+      })
+        .then((res) => {
+          this.loading = false;
+          if (res.data.length == 0 && this.choose_time != "") {
+            this.$message.warning(`没有查到日期${this.choose_time}的数据`);
+            return;
+          } else if (res.data.length == 0 && this.choose_time == "") {
+            this.$message.warning("未查询到相关数据");
+            return;
+          }
+
+          if (res.data.length != 0) {
+            console.log("查询结果不为空");
+            this.$message.success("查询成功");
+            for (let item of res.data) {
+              item.trading_date = utcToCst(item.trading_date)
+                .slice(0, 10)
+                .replace(/上|下|中|午|晚|早|凌|晨/g, "")
+                .replace(/\//g, "-");
             }
 
-            if (res.data.length != 0) {
-              this.$message.success("查询成功");
+            if (this.choose_time != "") {
+              this.queryResData = [];
+
+              // 对匹配到的时间，向结果列表推进数据
               for (let item of res.data) {
-                item.trading_date = utcToCst(item.trading_date)
-                  .slice(0, 10)
-                  .replace(/上|下|中|午|晚|早|凌|晨/g, "")
-                  .replace(/\//g, "-");
-              }
-
-              if (this.choose_time != "") {
-                this.queryResData = [];
-
-                // 对匹配到的时间，向结果列表推进数据
-                for (let item of res.data) {
-                  if (item.trading_date == this.choose_time) {
-                    this.queryResData.push(item);
-                  }
+                if (item.trading_date == this.choose_time) {
+                  this.queryResData.push(item);
                 }
-                //  如果推进的数据为空，则提示唔该日期数据
-                if (this.queryResData.length == 0) {
-                  if (this.choose_time != "" && this.choose_time != null) {
-                    this.$message.warning(`没有查到日期${this.choose_time}的数据`);
-                  }
-                  return;
-                }
-              } else {
-                // 如果时间为空，查询字段不为空，那么直接将数据倾倒进来
-                this.queryResData = res.data;
               }
+              //  如果推进的数据为空，则提示唔该日期数据
+              if (this.queryResData.length == 0) {
+                if (this.choose_time != "" && this.choose_time != null) {
+                  this.$message.warning(`没有查到日期${this.choose_time}的数据`);
+                }
+                return;
+              }
+            } else {
+              // 如果时间为空，查询字段不为空，那么直接将数据倾倒进来
+              this.queryResData = res.data;
             }
-          })
-          .catch((err) => {
-            this.$message.error(err);
-          });
-      } else {
-        this.refreshFormSearch();
-      }
+          }
+        })
+        .catch((err) => {
+          this.$message.error(err);
+        });
+      //  }
+      //   else {
+      //   this.refreshFormSearch();
+      // }
     },
     // 刷新查询
     refreshFormSearch() {
       if (this.choose_time == null) {
         this.choose_time = "";
       }
-      if (/^\d+$/.test(this.formData.customer_info)) {
+
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.tradingReqUrl = "/api/query/getTradingByCustomerId";
         this.tradingReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -266,7 +286,7 @@ export default {
         this.tradingReqUrl = "/api/query/getTradingByCompanyName";
         this.tradingReqData = { company_name: this.formData.customer_info };
       }
-
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.tradingReqUrl,
@@ -274,14 +294,15 @@ export default {
       })
         .then((res) => {
           console.log(res);
-          if (res.data.length == 0 && this.choose_time != "" && this.choose_time != null) {
+          this.loading = false;
+          if (res.data.length == 0 && (this.choose_time != "" || this.choose_time != null)) {
             this.$message.warning(`没有查到日期${this.choose_time}的数据`);
             return;
-          } else if (res.data.length == 0 && this.choose_time == "" && this.choose_time == null) {
+          } else if (res.data.length == 0 && (this.choose_time == "" || this.choose_time == null)) {
             this.$message.warning("未查询到相关数据");
             return;
           }
-
+          this.loading = false;
           if (res.data.length != 0) {
             for (let item of res.data) {
               item.trading_date = utcToCst(item.trading_date)
@@ -327,7 +348,7 @@ export default {
     formData: {
       handler: function(nV, oV) {
         // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/^\d+$/.test(this.formData.customer_info)) {
+        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
           this.locateReqUrl = "/api/query/getLocateCustomerId";
           this.locateReqData = { customer_id: nV.customer_info };
         } else {

@@ -1,6 +1,6 @@
 module.exports = {
   devServer: {
-
+disableHostCheck: true,
     proxy: {
       "/api": {
         //这里最好有一个 /

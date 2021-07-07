@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
+    "n": "node F:/宝塔_node/storageManager/storage/src/server ",
     "build": "vue-cli-service build"
   },
   "dependencies": {
@@ -12,7 +13,9 @@
     "core-js": "^3.11.2",
     "element-ui": "^2.15.1",
     "express": "^4.17.1",
+    "express-jwt": "^6.0.0",
     "http-proxy-middleware": "^2.0.0",
+    "jsonwebtoken": "^8.5.1",
     "less-loader": "^4.1.0",
     "mysql": "^2.18.1",
     "postcss-pxtorem": "^5.1.1",

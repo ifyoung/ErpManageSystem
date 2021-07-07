@@ -1,7 +1,7 @@
 <template>
   <div class="header-container">
     <div class="module-title">
-      <h1>货品入库</h1>
+      <h1 >货品入库</h1>
     </div>
 
     <div class="content-container">
@@ -10,7 +10,7 @@
           <el-form :model="formData" ref="formData" label-width="120px" label-position="left">
             <el-form-item label="客户信息" prop="customer_info">
               <el-autocomplete
-                style="width:405px"
+                    style="width:100%"
                 v-model="formData.customer_info"
                 :fetch-suggestions="querySearch"
                 clearable
@@ -20,7 +20,7 @@
             </el-form-item>
           </el-form>
         </el-col>
-        <el-col style="margin-left:30px;" :span="2">
+        <el-col style="margin-left:10px;" :span="2">
           <el-button type="primary" @click="formSearch">查询</el-button>
         </el-col>
         <el-col :span="2">
@@ -32,10 +32,17 @@
       </el-row>
       <el-row style="padding-top:10px">
         <el-col class="customer-table" :span="24">
-          <el-table @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
+          <el-table height="400"
+            v-loading="loading"
+            element-loading-text="加载中..."
+            element-loading-custom-class="loading_color"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.5)"
+           @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
-            <el-table-column align="center" label="入库时间" prop="come_time"></el-table-column>
+               <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
+            <el-table-column align="center" label="入库时间" prop="come_time" width="100px"></el-table-column>
             <el-table-column align="center" label="货品名称" prop="product_name"></el-table-column>
             <el-table-column align="center" label="货品SKU" prop="product_sku"></el-table-column>
             <el-table-column align="center" label="数量" prop="storage_count"></el-table-column>
@@ -136,6 +143,7 @@ export default {
     return {
       times: 0, // 监听计数
       timer: null,
+      loading:false, // 加载标识，默认为false,当调用接口时赋值为true
       addCount: 0,
       today_date: "", // 今天的日期
       pickerOption: {
@@ -247,7 +255,7 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.productReqUrl = "/api/query/getProductByCustomerId";
         this.productReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -257,13 +265,18 @@ export default {
         this.productReqUrl = "/api/query/getProductByCompanyName";
         this.productReqData = { company_name: this.formData.customer_info };
       }
+      this.loading = true;
 
+      console.log(this.productReqUrl)
+      console.log(this.productReqData)
+      
       this.$http({
         method: "post",
         url: this.productReqUrl,
         data: this.productReqData,
       })
         .then((res) => {
+            this.loading = false;
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -288,7 +301,7 @@ export default {
 
     // 查询
     refreshFormSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.productReqUrl = "/api/query/getProductByCustomerId";
         this.productReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -299,12 +312,16 @@ export default {
         this.productReqData = { company_name: this.formData.customer_info };
       }
 
+      console.log(this.productReqUrl)
+      console.log(this.productReqData)
+  this.loading = true;
       this.$http({
         method: "post",
         url: this.productReqUrl,
         data: this.productReqData,
       })
         .then((res) => {
+            this.loading = false;
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
@@ -507,7 +524,7 @@ export default {
     formData: {
       handler: function(nV, oV) {
         // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/^\d+$/.test(this.formData.customer_info)) {
+        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
           this.locateReqUrl = "/api/query/getLocateCustomerId";
           this.locateReqData = { customer_id: nV.customer_info };
         } else {

@@ -9,7 +9,7 @@
           <el-form :model="formData" ref="formData" :rules="rules" label-width="120px" label-position="left">
             <el-form-item label="客户信息" prop="customer_info">
               <el-autocomplete
-                style="width:355px"
+                style="width:100%"
                 v-model="formData.customer_info"
                 :fetch-suggestions="querySearch"
                 clearable
@@ -19,7 +19,7 @@
             </el-form-item>
           </el-form>
         </el-col>
-        <el-col style="margin-left:30px;" :span="2">
+        <el-col style="margin-left:10px;" :span="2">
           <el-button type="primary" @click="formSearch">查询</el-button>
         </el-col>
         <el-col :span="2">
@@ -28,10 +28,23 @@
       </el-row>
 
       <el-row style="padding-top:5px;">
-        <el-col class="customer-table" :span="18">
-          <el-table @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="queryResData_trading_pagination">
+        <el-col class="customer-table" :span="24">
+          <el-table
+            height="405"
+            v-loading="loading"
+            element-loading-text="加载中..."
+            element-loading-custom-class="loading_color"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.5)"
+            @selection-change="handleSelectionChange"
+            :row-style="showRow"
+            border
+            stripe
+            :data="queryResData_trading_pagination"
+          >
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
+            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
             <el-table-column align="center" label="交易日期" prop="trading_date"></el-table-column>
             <el-table-column align="center" label="内容" prop="trading_content"></el-table-column>
             <el-table-column align="center" label="金额" prop="trading_amount"></el-table-column>
@@ -40,7 +53,7 @@
         </el-col>
       </el-row>
       <el-row type="flex" class="padding_tb">
-        <el-col :span="18">
+        <el-col :span="24">
           <el-pagination
             class="page-pagination"
             :background="true"
@@ -60,11 +73,11 @@
         <el-col :span="2">
           <el-button class="add-btn" @click="addOpen">添加</el-button>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="18">
           <el-button type="primary" :disabled="isModify" plain @click="modifyOpen">修改</el-button>
         </el-col>
         <el-col :span="2">
-          <el-button type="danger" :disabled="isDel" @click="deleteSubmit">删除</el-button>
+          <el-button type="danger" :disabled="isDel" @click="deleteSubmit">撤回</el-button>
         </el-col>
         <el-col :span="2">
           <el-button type="info" plain @click="toggleSelection()">取消选择</el-button>
@@ -199,6 +212,7 @@ export default {
     return {
       times: 0, // 监听计数
       timer: null,
+      loading: false, // 加载标识，默认为false,当调用接口时赋值为true
       isDel: true,
       isModify: true,
       multipleSelection: [], // 勾选列表
@@ -318,7 +332,7 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.tradingReqUrl = "/api/query/getTradingByCustomerId";
         this.tradingReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -342,15 +356,16 @@ export default {
     },
     // 获取交易信息的接口方法
     getTrading() {
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.tradingReqUrl,
         data: this.tradingReqData,
       })
         .then((res) => {
+          this.loading = false;
           if (res.data.length != 0) {
             this.$message.success("查询成功");
-
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
               let today = Date.parse(new Date(this.today_date));
@@ -373,7 +388,7 @@ export default {
     },
     // 刷新查询
     refreshFormSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.tradingReqUrl = "/api/query/getTradingByCustomerId";
         // this.leaveAmountReqUrl = "/api/query/getLeaveAmountByCustomerId";
         // this.rechargeReqUrl = "/api/query/getRechargeByCustomerId";
@@ -401,12 +416,14 @@ export default {
     },
     // 刷新获取交易信息
     refreshGetTrading() {
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.tradingReqUrl,
         data: this.tradingReqData,
       })
         .then((res) => {
+          this.loading = false;
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
@@ -563,7 +580,7 @@ export default {
           this.$message.error(err);
         });
     },
-    // 删除提交
+    // 撤回提交
     deleteSubmit() {
       if (this.multipleSelection.length != 0) {
         this.solidSelection = this.multipleSelection;
@@ -588,7 +605,7 @@ export default {
     formData: {
       handler: function(nV, oV) {
         // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/^\d+$/.test(this.formData.customer_info)) {
+        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
           this.locateReqUrl = "/api/query/getLocateCustomerId";
           this.locateReqData = { customer_id: nV.customer_info };
         } else {
@@ -634,4 +651,6 @@ export default {
     padding-left: 20px;
   }
 }
+
+
 </style>

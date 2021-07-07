@@ -1,7 +1,7 @@
 <template>
   <div class="header-container">
     <div class="module-title">
-      <h1>通知中心</h1>
+      <h1>订单中心</h1>
     </div>
     <div class="content-container">
         

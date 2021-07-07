@@ -10,7 +10,7 @@
           <el-form :model="formData" ref="formData" label-width="100px" label-position="left">
             <el-form-item label="客户信息:" prop="customer_info">
               <el-autocomplete
-                style="width:380px"
+                 style="width:100%"
                 v-model="formData.customer_info"
                 :fetch-suggestions="querySearch"
                 clearable
@@ -20,7 +20,7 @@
             </el-form-item>
           </el-form>
         </el-col>
-        <el-col style="margin-left:30px;" :span="2">
+        <el-col style="margin-left:10px;" :span="2">
           <el-button type="primary" @click="formSearch">查询</el-button>
         </el-col>
         <el-col :span="2">
@@ -29,19 +29,24 @@
       </el-row>
       <el-row style="padding-top:20px">
         <el-col class="customer-table" :span="24">
-          <el-table @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
-            <el-table-column align="center" type="selection" width="100px"></el-table-column>
-            <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
-
-            <el-table-column align="center" label="名称" prop="product_name"></el-table-column>
-            <el-table-column align="center" label="规格(cm)" prop="length_width_height" width="120px"></el-table-column>
+             <el-table  height="445"
+            v-loading="loading"
+            element-loading-text="加载中..."
+            element-loading-custom-class="loading_color"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.5)"
+           @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
+            <!-- <el-table-column align="center" type="selection" width="100px"></el-table-column> -->
+            <el-table-column align="center" label="客户编号" prop="customer_id" width="150px"></el-table-column>
+            <el-table-column align="center" label="公司名称" prop="company_name" width="150px"></el-table-column>
+            <el-table-column align="center" label="名称" prop="product_name" width="200px"></el-table-column>
+            <el-table-column align="center" label="规格(cm)" prop="length_width_height" width="150px"></el-table-column>
             <el-table-column align="center" label="重量(lb)" prop="weight"></el-table-column>
-            <el-table-column align="center" label="仓储数量" prop="count"></el-table-column>
-
-            <el-table-column align="center" label="入库时间" prop="come_time"></el-table-column>
+            <el-table-column align="center" label="入库时间" prop="come_time" width="100px"></el-table-column>
             <el-table-column align="center" label="仓储天数" prop="save_days"></el-table-column>
+            <el-table-column align="center" label="仓储数量" prop="count"></el-table-column>
             <el-table-column align="center" label="出库数量" prop="out_count"></el-table-column>
-            <el-table-column align="center" label="出库操作" width="220px">
+            <el-table-column align="center" label="出库操作" width="200px">
               <template slot-scope="scope">
                 <div class="sa-container">
                   <el-input placeholder="请输入" v-model="scope.row.operateCount"></el-input>
@@ -80,6 +85,7 @@ export default {
     return {
       times: 0, // 监听计数
       timer: null,
+        loading:false, // 加载标识，默认为false,当调用接口时赋值为true
       today_date: "", // 今天的日期
       pickerOption: {
         disabledDate: (time) => {
@@ -173,7 +179,7 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.boxReqUrl = "/api/query/getBoxByCustomerId";
         this.boxReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -188,12 +194,14 @@ export default {
 
     // 获取箱子信息
     getBox() {
+      this.loading = true
       this.$http({
         method: "post",
         url: this.boxReqUrl,
         data: this.boxReqData,
       })
         .then((res) => {
+          this.loading = false
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -219,7 +227,7 @@ export default {
 
     // 刷新箱子信息列表
     refreshGetBox() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.boxReqUrl = "/api/query/getBoxByCustomerId";
         this.boxReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
@@ -229,13 +237,14 @@ export default {
         this.boxReqUrl = "/api/query/getBoxByCompanyName";
         this.boxReqData = { company_name: this.formData.customer_info };
       }
-
+this.loading = true
       this.$http({
         method: "post",
         url: this.boxReqUrl,
         data: this.boxReqData,
       })
         .then((res) => {
+          this.loading = false
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
@@ -390,7 +399,7 @@ export default {
           data.out_time = getNowFormatDate();
 
           this.updateBox(data);
-          this.insertOutRecord(data,row);
+          this.insertOutRecord(data, row);
         })
         .catch((err) => {
           console.log(err);
@@ -413,8 +422,8 @@ export default {
     },
 
     // 添加 出库记录 信息
-    insertOutRecord(data,row) {
-       this.$http({
+    insertOutRecord(data, row) {
+      this.$http({
         method: "post",
         url: "api/insert/insertOutRecord",
         data: {
@@ -429,13 +438,13 @@ export default {
           console.log("添加箱子出库记录信息成功");
         })
         .catch((err) => {});
-    }
+    },
   },
   watch: {
     formData: {
       handler: function(nV, oV) {
         // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/^\d+$/.test(this.formData.customer_info)) {
+        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
           this.locateReqUrl = "/api/query/getLocateCustomerId";
           this.locateReqData = { customer_id: nV.customer_info };
         } else {

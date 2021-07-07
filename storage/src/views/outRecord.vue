@@ -20,7 +20,7 @@
             </el-form-item>
           </el-form>
         </el-col>
-        <el-col style="margin-left:30px;" :span="2">
+        <el-col style="margin-left:10px;" :span="2">
           <el-button type="primary" @click="formSearch">查询</el-button>
         </el-col>
         <el-col :span="2">
@@ -29,10 +29,24 @@
       </el-row>
       <el-row style="padding-top:5px">
         <el-col class="customer-table" :span="24">
-          <el-table @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
+          <el-table
+            height="405"
+            v-loading="loading"
+            element-loading-text="加载中..."
+            element-loading-custom-class="loading_color"
+            element-loading-spinner="el-icon-loading"
+            element-loading-background="rgba(0, 0, 0, 0.5)"
+            @selection-change="handleSelectionChange"
+            :row-style="showRow"
+            border
+            stripe
+            :data="computedQueryResData"
+            ref="multipleTable"
+          >
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
-            <el-table-column align="center" label="名称" prop="product_name"></el-table-column>
+            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
+            <el-table-column align="center" label="名称" prop="product_name" width="270px"></el-table-column>
             <el-table-column align="center" label="货品SKU" prop="product_sku"></el-table-column>
             <el-table-column align="center" label="出库时间" prop="out_time"></el-table-column>
             <el-table-column align="center" label="出库数量" prop="out_count"></el-table-column>
@@ -71,6 +85,7 @@ export default {
     return {
       times: 0, // 监听计数
       timer: null,
+      loading: false, // 加载标识，默认为false,当调用接口时赋值为true
       isDel: true, // 删除是否禁用
       multipleSelection: [], // 勾选列表
       solidSelection: [], // 防渲染后勾选消失的列表
@@ -129,7 +144,7 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.outRecordReqUrl = "/api/query/getOutRecordByCustomerId";
         this.outRecordReqData = { customer_id: this.formData.customer_info };
         this.getOutRecord();
@@ -152,12 +167,14 @@ export default {
     },
     // 获取指定查询的货品信息
     getOutRecord() {
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.outRecordReqUrl,
         data: this.outRecordReqData,
       })
         .then((res) => {
+          this.loading = false;
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -177,11 +194,13 @@ export default {
 
     // 获取所有的货品信息
     getAllOutRecord() {
+      this.loading = true;
       this.$http({
         method: "post",
         url: "/api/query/getAllOutRecord",
       })
         .then((res) => {
+          this.loading = false;
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -200,11 +219,13 @@ export default {
     },
     // 获取所有的 出品信息 信息,不提示查询成功
     refreshGetAllOutRecord() {
+      this.loading = true;
       this.$http({
         method: "post",
         url: "/api/query/getAllOutRecord",
       })
         .then((res) => {
+          this.loading = false;
           for (let item of res.data) {
             item.out_time = utcToCst(item.out_time)
               .slice(0, 10)
@@ -223,6 +244,7 @@ export default {
         .then(() => {
           this.solidSelection = this.multipleSelection;
           while (this.solidSelection.length != 0) {
+            this.withdrawOutRecord();
             this.deleteOutRecord();
             this.solidSelection.shift();
           }
@@ -252,10 +274,39 @@ export default {
           this.$message.error(err);
         });
     },
+    // 撤回 出库记录 信息
+    withdrawOutRecord() {
+      let url = "api/update/updateOutRecordWithBox";
+      let data = {
+        customer_id: this.solidSelection[0].customer_id,
+        product_name: this.solidSelection[0].product_name,
+        product_sku: this.solidSelection[0].product_sku,
+        out_count: this.solidSelection[0].out_count,
+        out_time:this.solidSelection[0].out_time
+      };
+      if (this.solidSelection[0].product_sku != "---") {
+        url = "api/update/updateOutRecordWithProduct";
+      }
 
-  // 查询
+      console.log(this.solidSelection[0]);
+      console.log(url);
+      console.log(data);
+
+      this.$http({
+        method: "post",
+        url: url,
+        data: data,
+      })
+        .then((res) => {
+          this.refreshGetAllOutRecord();
+        })
+        .catch((err) => {
+          this.$message.error(err);
+        });
+    },
+    // 查询
     refreshFormSearch() {
-      if (/^\d+$/.test(this.formData.customer_info)) {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
         this.boxReqUrl = "/api/query/getBoxByCustomerId";
         this.boxReqData = { customer_id: this.formData.customer_info };
       } else if ((this.formData.customer_info = "")) {
@@ -267,7 +318,6 @@ export default {
       }
       this.refreshGetOutRecord();
     },
-
 
     // 监听输入框，有变动就触发防抖函数
     getData() {
@@ -303,7 +353,7 @@ export default {
     formData: {
       handler: function(nV, oV) {
         // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/^\d+$/.test(this.formData.customer_info)) {
+        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
           this.locateReqUrl = "/api/query/getLocateCustomerId";
           this.locateReqData = { customer_id: nV.customer_info };
         } else {

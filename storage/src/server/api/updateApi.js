@@ -1,13 +1,8 @@
-// homeApi.js
-var models = require("../db"); // 引入db配置
 var express = require("express"); // express框架
 var router = express.Router();
-var mysql = require("mysql");
 var $sql = require("../sqlMap"); // sql语句
+var conn = require("../conn") // 引用封装的mysql.js
 
-// 连接数据库
-var conn = mysql.createConnection(models.mysql);
-conn.connect();
 
 var jsonWrite = function(res, ret) {
   if (typeof ret === "undefined") {
@@ -36,7 +31,7 @@ router.post("/updateProduct", (req, res) => {
       parms.out_count,
       parms.status,
       parms.out_time,
-      
+
       parms.customer_id,
       parms.product_code,
     ],
@@ -74,7 +69,6 @@ router.post("/updateBox", (req, res) => {
 
       parms.customer_id,
       parms.box_code,
-
     ],
     function(err, result) {
       if (err) {
@@ -128,4 +122,39 @@ router.post("/updateUser", (req, res) => {
   });
 });
 
+// 更新箱子信息
+router.post("/updateOutRecordWithBox", (req, res) => {
+  var sql = $sql.update.updateOutRecordWithBox;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_id, parms.product_name, parms.out_count, parms.product_sku,parms.out_time], function(err, result) {
+    if (err) {
+      console.log(err);
+      // console.log(store.state.sql.sqlState)
+      console.log("报错了天哪");
+    }
+    if (result) {
+      jsonWrite(res, result);
+    }
+  });
+});
+
+
+// 更新货物信息
+router.post("/updateOutRecordWithProduct", (req, res) => {
+  var sql = $sql.update.updateOutRecordWithProduct;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_id, parms.product_name, parms.out_count, parms.product_sku], function(err, result) {
+    if (err) {
+      console.log(err);
+      // console.log(store.state.sql.sqlState)
+      console.log("报错了天哪");
+    }
+    if (result) {
+      jsonWrite(res, result);
+    }
+  });
+});
+module.e
 module.exports = router;
