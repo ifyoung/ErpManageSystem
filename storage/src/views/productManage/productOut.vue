@@ -259,6 +259,7 @@ export default {
 
       this.$confirm("确认提交吗?")
         .then(() => {
+          let record_code = String(Math.floor(Math.random()*1000+8999))
           row.out_count = String(Number(row.out_count) + Number(row.count));
           let data = {};
           for (let name in row) {
@@ -269,8 +270,8 @@ export default {
           }
           data.out_time = getNowFormatDate();
 
-          this.updateProduct(data);
-          this.insertOutRecord(data,row);
+          this.updateProduct(data,record_code);
+          this.insertOutRecord(data,row,record_code);
         })
         .catch((err) => {
           console.log(err);
@@ -279,7 +280,8 @@ export default {
     },
 
     // 更新货品信息
-    updateProduct(data) {
+    updateProduct(data,random) {
+      data.record_code = random;
       this.$http({
         method: "post",
         url: "api/update/updateProduct",
@@ -293,7 +295,7 @@ export default {
     },
 
     // 添加 出库记录 信息
-    insertOutRecord(data,row) {
+    insertOutRecord(data,row,random) {
       console.log(row);
       this.$http({
         method: "post",
@@ -304,6 +306,8 @@ export default {
           product_sku: data.product_sku,
           out_time: data.out_time,
           out_count: row.count,
+          record_code: random,
+          status:"false",
         },
       })
         .then((res) => {

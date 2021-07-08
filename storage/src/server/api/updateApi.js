@@ -31,9 +31,11 @@ router.post("/updateProduct", (req, res) => {
       parms.out_count,
       parms.status,
       parms.out_time,
+      parms.record_code,
 
       parms.customer_id,
       parms.product_code,
+      
     ],
     function(err, result) {
       if (err) {
@@ -66,6 +68,7 @@ router.post("/updateBox", (req, res) => {
       parms.save_days,
       parms.status,
       parms.out_time,
+      parms.record_code,
 
       parms.customer_id,
       parms.box_code,
@@ -127,7 +130,7 @@ router.post("/updateOutRecordWithBox", (req, res) => {
   var sql = $sql.update.updateOutRecordWithBox;
   var parms = req.body;
   console.log(parms);
-  conn.query(sql, [parms.customer_id, parms.product_name, parms.out_count, parms.product_sku,parms.out_time], function(err, result) {
+  conn.query(sql, [parms.status,parms.customer_id, parms.product_name, parms.out_count, parms.product_sku,parms.out_time,parms.record_code], function(err, result) {
     if (err) {
       console.log(err);
       // console.log(store.state.sql.sqlState)
@@ -145,7 +148,7 @@ router.post("/updateOutRecordWithProduct", (req, res) => {
   var sql = $sql.update.updateOutRecordWithProduct;
   var parms = req.body;
   console.log(parms);
-  conn.query(sql, [parms.customer_id, parms.product_name, parms.out_count, parms.product_sku], function(err, result) {
+  conn.query(sql, [parms.status,parms.customer_id, parms.product_name, parms.out_count, parms.product_sku,parms.record_code], function(err, result) {
     if (err) {
       console.log(err);
       // console.log(store.state.sql.sqlState)

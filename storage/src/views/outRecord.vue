@@ -130,6 +130,7 @@ export default {
     },
     // 监听勾选
     handleSelectionChange(val) {
+      console.log(val);
       if (val.length == 0) {
         this.isDel = true;
       } else {
@@ -201,14 +202,19 @@ export default {
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
-              item.out_time = utcToCst(item.out_time)
-                .slice(0, 10)
-                .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+              if (item.status == "true") {
+                continue;
+              } else {
+                item.out_time = utcToCst(item.out_time)
+                  .slice(0, 10)
+                  .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+                this.queryResData.push(item);
+              }
             }
-            this.queryResData = res.data;
           } else {
             this.$message.warning("未查询到相关数据");
           }
@@ -226,12 +232,18 @@ export default {
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
           for (let item of res.data) {
-            item.out_time = utcToCst(item.out_time)
-              .slice(0, 10)
-              .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+            console.log(item);
+            if (item.status == "true") {
+              continue;
+            } else {
+              item.out_time = utcToCst(item.out_time)
+                .slice(0, 10)
+                .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+              this.queryResData.push(item);
+            }
           }
-          this.queryResData = res.data;
         })
         .catch((err) => {
           this.$message.error(err);
@@ -245,7 +257,7 @@ export default {
           this.solidSelection = this.multipleSelection;
           while (this.solidSelection.length != 0) {
             this.withdrawOutRecord();
-            this.deleteOutRecord();
+            // this.deleteOutRecord();
             this.solidSelection.shift();
           }
           this.$message.success("删除出库记录信息成功!");
@@ -265,6 +277,7 @@ export default {
           product_sku: this.solidSelection[0].product_sku,
           out_time: this.solidSelection[0].out_time,
           out_count: this.solidSelection[0].out_count,
+          record_code: this.solidSelection[0].record_code,
         },
       })
         .then((res) => {
@@ -278,11 +291,13 @@ export default {
     withdrawOutRecord() {
       let url = "api/update/updateOutRecordWithBox";
       let data = {
+        status: "true",
         customer_id: this.solidSelection[0].customer_id,
         product_name: this.solidSelection[0].product_name,
         product_sku: this.solidSelection[0].product_sku,
         out_count: this.solidSelection[0].out_count,
-        out_time:this.solidSelection[0].out_time
+        out_time: this.solidSelection[0].out_time,
+        record_code: this.solidSelection[0].record_code,
       };
       if (this.solidSelection[0].product_sku != "---") {
         url = "api/update/updateOutRecordWithProduct";
@@ -303,20 +318,6 @@ export default {
         .catch((err) => {
           this.$message.error(err);
         });
-    },
-    // 查询
-    refreshFormSearch() {
-      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-        this.boxReqUrl = "/api/query/getBoxByCustomerId";
-        this.boxReqData = { customer_id: this.formData.customer_info };
-      } else if ((this.formData.customer_info = "")) {
-        this.boxReqUrl = "/api/query/getAllBox";
-        this.boxReqData = {};
-      } else {
-        this.boxReqUrl = "/api/query/getBoxByCompanyName";
-        this.boxReqData = { company_name: this.formData.customer_info };
-      }
-      this.refreshGetOutRecord();
     },
 
     // 监听输入框，有变动就触发防抖函数

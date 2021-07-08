@@ -214,6 +214,7 @@ export default {
         box_code: "",
         status: "待出库",
         out_time: "1970-01-01",
+        record_code:"",
       },
       rules: {
         customer_info: [{ message: "请输入客户信息", required: true, trigger: ["blur", "change"] }],
@@ -455,7 +456,7 @@ export default {
     addSubmit() {
       // 对货品添加列表进行校验，如果有漏填项则提示
       for (let key in this.addForm) {
-        if (key == "box_code" || key == "out_time") {
+        if (key == "box_code" || key == "out_time" || key =="record_code") {
           continue;
         }
 

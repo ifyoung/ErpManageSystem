@@ -48,6 +48,7 @@ router.post("/insertProduct", (req, res) => {
       parms.status,
       parms.product_code,
       parms.out_time,
+      parms.record_code
     ],
     function(err, result) {
       // conn.query(sql, this.$store.state.sql.querySearchPropertyArr, function(err, result) {
@@ -100,6 +101,7 @@ router.post("/insertBox", (req, res) => {
       parms.box_code,
       parms.real_weight,
       parms.out_time,
+      parms.record_code
     ],
     function(err, result) {
       // conn.query(sql, this.$store.state.sql.querySearchPropertyArr, function(err, result) {
@@ -114,12 +116,12 @@ router.post("/insertBox", (req, res) => {
   );
 });
 
-// 插入 出库记录 信息
+// 插入 出库记录 信息/
 router.post("/insertOutRecord", (req, res) => {
   var sql = $sql.insert.insertOutRecord;
   var parms = req.body;
   console.log(parms);
-  conn.query(sql, [parms.customer_id, parms.product_name, parms.product_sku, parms.out_time, parms.out_count], function(err, result) {
+  conn.query(sql, [parms.customer_id, parms.product_name, parms.product_sku, parms.out_time, parms.out_count,parms.record_code,parms.status], function(err, result) {
     // conn.query(sql, this.$store.state.sql.querySearchPropertyArr, function(err, result) {
     if (err) {
       console.log(err);

@@ -83,7 +83,7 @@ router.post("/deleteOutRecord", (req, res) => {
   var sql = $sql.delete.deleteOutRecord;
   var parms = req.body;
   console.log(parms);
-  conn.query(sql, [parms.customer_id, parms.product_name, parms.product_sku, parms.out_time, parms.out_count], function(err, result) {
+  conn.query(sql, [parms.customer_id, parms.product_name, parms.product_sku, parms.out_time, parms.out_count,parms.record_code], function(err, result) {
     // conn.query(sql, this.$store.state.sql.querySearchPropertyArr, function(err, result) {
     if (err) {
       console.log(err);

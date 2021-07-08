@@ -309,49 +309,6 @@ this.loading = true
       }
       this.addDV = true;
     },
-    // 提交货品信息
-    addSubmit() {
-      // 对货品添加列表进行校验，如果有漏填项则提示
-      for (let key in this.addForm) {
-        if (key == "box_code") {
-          continue;
-        }
-        if (this.addForm[key] == "") {
-          this.$message.error(`存在漏缺项--${this.louqueForm[key]}--`);
-          return;
-        }
-      }
-      this.addForm.box_code = Math.floor(Math.random() * 8999 + 1000);
-      this.$http({
-        method: "post",
-        url: "api/insert/insertBox",
-        data: this.addForm,
-      })
-        .then((res) => {
-          this.$message.success("添加成功!");
-          this.refreshGetBox();
-          this.addDV = false;
-        })
-        .catch((err) => {});
-    },
-    // 检查货品信息中客户id是否已存在的接口方法
-    checkCustomerId() {
-      this.$http({
-        method: "post",
-        url: "api/query/getCustomerId",
-        data: {
-          customer_id: this.addForm.customer_id,
-        },
-      })
-        .then((res) => {
-          if (res.data.length == 0) {
-            this.$message.warning(`不存在编号为${this.addForm.customer_id}的客户，请重新输入！`);
-          } else {
-            this.addSubmit();
-          }
-        })
-        .catch((err) => {});
-    },
     // 出库减法操作
     outSubtract(row) {
       if (row.operateCount == 0) {
@@ -390,6 +347,7 @@ this.loading = true
         .then(() => {
           row.out_count = String(Number(row.out_count) + Number(row.operateCount));
           let data = {};
+          let record_code =String(Math.floor(Math.random()*1000+8999));
           for (let name in row) {
             if (name == "operateCount") {
               continue;
@@ -398,8 +356,8 @@ this.loading = true
           }
           data.out_time = getNowFormatDate();
 
-          this.updateBox(data);
-          this.insertOutRecord(data, row);
+          this.updateBox(data,record_code);
+          this.insertOutRecord(data, row,record_code);
         })
         .catch((err) => {
           console.log(err);
@@ -422,7 +380,7 @@ this.loading = true
     },
 
     // 添加 出库记录 信息
-    insertOutRecord(data, row) {
+    insertOutRecord(data, row,random) {
       this.$http({
         method: "post",
         url: "api/insert/insertOutRecord",
@@ -432,6 +390,8 @@ this.loading = true
           product_sku: "---",
           out_time: data.out_time,
           out_count: row.operateCount,
+          record_code: random,
+          status:"false",
         },
       })
         .then((res) => {
