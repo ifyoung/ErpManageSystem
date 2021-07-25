@@ -15,7 +15,7 @@ var jsonWrite = function(res, ret) {
   }
 };
 
-// 更新保单信息
+// 更新货品信息
 router.post("/updateProduct", (req, res) => {
   var sql = $sql.update.updateProduct;
   var parms = req.body;
@@ -44,8 +44,6 @@ router.post("/updateProduct", (req, res) => {
         console.log("报错了天哪");
       }
       if (result) {
-        console.log("成功上传了货品数据");
-
         jsonWrite(res, result);
       }
     }

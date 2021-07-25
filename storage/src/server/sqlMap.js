@@ -1,8 +1,10 @@
 // sqlmap.js
 var sqlMap = {
   query: {
-    // 登录校验
-    login: `SELECT * from user where username=? and password=?`,
+    // 根据管理员表登录校验
+    loginInUser: `SELECT * from user where username=? and password=?`,
+    // 根据客户表登录校验
+    loginInCustomer: `SELECT * from customer_info where customer_id=? and auto_pwd=?`,
     // 获取客户信息
     getCustomer: `select * from customer_info`,
     // 获取客户信息id
@@ -34,18 +36,20 @@ var sqlMap = {
     // 查询是否有相同sku
     getSameSku: `Select * From product where customer_id = ? and product_name = ? and product_sku = ?`,
     // 依据客户id或者所属公司获取 出库记录 信息
-    getOutRecordByCustomerId: `SELECT  c.customer_id,c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku FROM  out_record o,customer_info c where c.customer_id = o.customer_id  and where customer_id = ?`,
-    getOutRecordByCompanyName: `SELECT  c.customer_id,c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku FROM  out_record o,customer_info c where c.customer_id = o.customer_id  and and LOCATE c.company_name = ? (?,c> 0`,
+    getOutRecordByCustomerId: `SELECT  c.customer_id,c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku,o.status,o.out_source FROM  out_record o,customer_info c where c.customer_id = o.customer_id  and  c.customer_id = ?`,
+    getOutRecordByCompanyName: `SELECT  c.customer_id,c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku,o.status,o.out_source FROM  out_record o,customer_info c where c.customer_id = o.customer_id  and  c.company_name = ?`,
     // 获取所有 出库记录 信息
-    getAllOutRecord: `SELECT  c.customer_id,c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku,o.record_code,o.status FROM  out_record o,customer_info c where c.customer_id = o.customer_id `,
+    getAllOutRecord: `SELECT  c.customer_id,c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku,o.record_code,o.status,o.out_source FROM  out_record o,customer_info c where c.customer_id = o.customer_id `,
+    // 获取地址
+    getAddress:`SELECT * FROM address where record_code = ?`
   },
   insert: {
-    insertCustomer: `INSERT INTO customer_info VALUES(?,?,?,?)`,
+    insertCustomer: `INSERT INTO customer_info VALUES(?,?,?,?,?)`,
     insertProduct: `INSERT INTO product VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
     insertTrading: `INSERT INTO trading_record VALUES(?,?,?,?,?,?)`,
     insertBox: `INSERT INTO box VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`,
-    
-    insertOutRecord: `INSERT INTO out_record VALUES(?,?,?,?,?,?,?)`,
+    insertOutRecord: `INSERT INTO out_record VALUES(?,?,?,?,?,?,?,?)`,
+    insertAddress: `INSERT INTO address VALUES(?,?,?,?,?,?,?,?,?,?,?,?)`,
   },
   delete: {
     deleteCustomer: `delete from customer_info where customer_id IN (?) `,

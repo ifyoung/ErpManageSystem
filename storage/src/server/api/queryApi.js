@@ -14,9 +14,25 @@ var jsonWrite = function(res, ret) {
   }
 };
 
-// 查询登录用户
-router.post("/login", (req, res) => {
-  var sql = $sql.query.login;
+// 查询登录管理员
+router.post("/loginInUser", (req, res) => {
+  var sql = $sql.query.loginInUser;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.username, parms.password], function(err, result) {
+    // conn.query(sql, this.$store.state.sql.querySearchPropertyArr, function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      jsonWrite(res, result);
+    }
+  });
+});
+
+// 查询登录客户
+router.post("/loginInCustomer", (req, res) => {
+  var sql = $sql.query.loginInCustomer;
   var parms = req.body;
   console.log(parms);
   conn.query(sql, [parms.username, parms.password], function(err, result) {
@@ -347,4 +363,19 @@ router.post("/getTradingByCompanyName", (req, res) => {
   });
 });
 
+// 获取地址表信息，根据 记录码
+
+router.post("/getAddress", (req, res) => {
+  var sql = $sql.query.getAddress;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.record_code], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
 module.exports = router;

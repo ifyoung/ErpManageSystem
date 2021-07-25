@@ -1,7 +1,7 @@
 <template>
   <div class="header-container">
     <div class="module-title">
-      <h1>箱子清单</h1>
+      <h1>货品清单</h1>
     </div>
 
     <div class="content-container">
@@ -44,15 +44,9 @@
             ref="multipleTable"
           >
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
-            <el-table-column align="center" label="客户编号" prop="customer_id" width="150px"></el-table-column>
-            <el-table-column align="center" label="公司名称" prop="company_name" width="150px"></el-table-column>
-            <el-table-column align="center" label="名称" prop="product_name" width="200px"></el-table-column>
-            <el-table-column align="center" label="规格(cm)" prop="length_width_height" width="150px"></el-table-column>
-            <el-table-column align="center" label="抛重重量(lb)" prop="weight" width="150px"></el-table-column>
-            <el-table-column align="center" label="实际重量(lb)" prop="real_weight" width="150px"></el-table-column>
-            <el-table-column align="center" label="入仓数量" prop="count"></el-table-column>
-            <el-table-column align="center" label="剩余数量" prop="leave_count"></el-table-column>
-            <el-table-column align="center" label="入库时间" prop="come_time" width="100px"></el-table-column>
+            <el-table-column align="center" label="客户名称" prop="customer_id"></el-table-column>
+            <el-table-column align="center" label="产品" prop="product_name"></el-table-column>
+              <el-table-column align="center" label="下单数量" prop="leave_count"></el-table-column>
             <el-table-column align="center" label="仓储天数" prop="save_days"></el-table-column>
           </el-table>
         </el-col>
@@ -92,17 +86,14 @@ export default {
       timer: null,
       loading: false, // 加载标识，默认为false,当调用接口时赋值为true
       today_date: "", // 今天的日期
-      isDel: true, // 删除禁用
-      multipleSelection: [], // 勾选列表
-      solidSelection: [], // 防渲染后勾选消失的列表
       pickerOption: {
         disabledDate: (time) => {
           return time.getTime() > Date.now(); /*今天及之前，注意数字不一样*/
         },
       },
-      addDV: false, // 对话框默认不显示
-      boxReqUrl: "", // 货品信息请求地址
-      boxReqData: {}, // 货品信息提交数据
+      isDel: true, // 删除禁用
+      productReqUrl: "", // 货品信息请求地址
+      productReqData: {}, // 货品信息提交数据
       locateReqUrl: "/api/query/getLocateCustomerId", // 模糊查询地址
       locateReqData: {}, // 模糊查询客户信息
       nameTipsArray: [], // 提醒下拉框
@@ -115,26 +106,12 @@ export default {
       louqueForm: {
         customer_id: "客户编号",
         come_time: "入库时间",
-        product_name: "箱子名称",
-        length_width_height: "规格(cm)",
-        weight: "重量(lb)",
-        count: "初始数量",
+        product_name: "货品名称",
+        product_sku: "货品SKU",
+        storage_count: "初始数量",
         save_days: "仓储天数",
         out_count: "出库数量",
-        box_code: "箱子码",
         status: "状态",
-      },
-      addForm: {
-        customer_id: "",
-        come_time: "",
-        product_name: "",
-        length_width_height: "",
-        weight: "",
-        count: "",
-        save_days: "",
-        out_count: "",
-        box_code: "",
-        status: "",
       },
       rules: {
         customer_info: [{ message: "请输入客户信息", required: true, trigger: ["blur", "change"] }],
@@ -144,12 +121,11 @@ export default {
         pageSize: 10,
         currentPage: 1,
       },
+      multipleSelection: [], // 勾选列表
+      solidSelection: [], // 防渲染后勾选消失的列表
     };
   },
   methods: {
-    handleClose() {
-      this.addDV = false;
-    },
     handleSizeChange(val) {
       this.queryPage.pageSize = val;
     },
@@ -184,39 +160,20 @@ export default {
     // 查询
     formSearch() {
       if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-        this.boxReqUrl = "/api/query/getBoxByCustomerId";
-        this.boxReqData = { customer_id: this.formData.customer_info };
+        this.productReqUrl = "/api/query/getProductByCustomerId";
+        this.productReqData = { customer_id: this.formData.customer_info };
       } else if (this.formData.customer_info == "") {
-        this.boxReqUrl = "/api/query/getAllBox";
-        this.boxReqData = {};
+        this.productReqUrl = "/api/query/getAllProduct";
+        this.productReqData = {};
       } else {
-        this.boxReqUrl = "/api/query/getBoxByCompanyName";
-        this.boxReqData = { company_name: this.formData.customer_info };
+        this.productReqUrl = "/api/query/getProductByCompanyName";
+        this.productReqData = { company_name: this.formData.customer_info };
       }
-      this.getBox();
-    },
-
-    // 刷新查询
-    refreshFormSearch() {
-      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-        this.boxReqUrl = "/api/query/getBoxByCustomerId";
-        this.boxReqData = { customer_id: this.formData.customer_info };
-      } else if (this.formData.customer_info == "") {
-        this.boxReqUrl = "/api/query/getAllBox";
-        this.boxReqData = {};
-      } else {
-        this.boxReqUrl = "/api/query/getBoxByCompanyName";
-        this.boxReqData = { company_name: this.formData.customer_info };
-      }
-      this.refreshGetBox();
-    },
-    // 获取箱子信息
-    getBox() {
       this.loading = true;
       this.$http({
         method: "post",
-        url: this.boxReqUrl,
-        data: this.boxReqData,
+        url: this.productReqUrl,
+        data: this.productReqData,
       })
         .then((res) => {
           this.loading = false;
@@ -227,11 +184,10 @@ export default {
               let today = Date.parse(new Date(this.today_date));
               var day = parseInt((today - come) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
               item.save_days = day;
-
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
-              item.leave_count = Number(item.count) - Number(item.out_count);
+              item.leave_count = Number(item.storage_count) - Number(item.out_count);
             }
             this.queryResData = res.data;
           } else {
@@ -242,64 +198,42 @@ export default {
           this.$message.error(err);
         });
     },
-    // 刷新箱子信息列表
-    refreshGetBox() {
+
+    // 查询
+    refreshFormSearch() {
+      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
+        this.productReqUrl = "/api/query/getProductByCustomerId";
+        this.productReqData = { customer_id: this.formData.customer_info };
+      } else if (this.formData.customer_info == "") {
+        this.productReqUrl = "/api/query/getAllProduct";
+        this.productReqData = {};
+      } else {
+        this.productReqUrl = "/api/query/getProductByCompanyName";
+        this.productReqData = { company_name: this.formData.customer_info };
+      }
       this.loading = true;
       this.$http({
         method: "post",
-        url: this.boxReqUrl,
-        data: this.boxReqData,
+        url: this.productReqUrl,
+        data: this.productReqData,
       })
         .then((res) => {
-          this.loading = false;
           console.log(res);
+          this.loading = false;
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
               let today = Date.parse(new Date(this.today_date));
               var day = parseInt((today - come) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
               item.save_days = day;
-
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
-              item.leave_count = Number(item.count) - Number(item.out_count);
+
+              item.leave_count = Number(item.storage_count) - Number(item.out_count);
             }
             this.queryResData = res.data;
           }
-        })
-        .catch((err) => {
-          this.$message.error(err);
-        });
-    },
-
-    // 删除提交
-    deleteSubmit() {
-      this.$confirm("确定删除客户信息?")
-        .then(() => {
-          this.solidSelection = this.multipleSelection;
-          while (this.solidSelection.length != 0) {
-            this.deleteBox();
-            this.solidSelection.shift();
-          }
-          this.$message.success("删除客户信息成功!");
-        })
-        .catch((err) => {
-          this.$message.warning("取消删除");
-        });
-    },
-    // 删除箱子信息
-    deleteBox() {
-      this.$http({
-        method: "post",
-        url: "api/delete/deleteBox",
-        data: {
-          customer_id: this.solidSelection[0].customer_id,
-          box_code: this.solidSelection[0].box_code,
-        },
-      })
-        .then((res) => {
-          this.refreshFormSearch();
         })
         .catch((err) => {
           this.$message.error(err);
@@ -343,55 +277,37 @@ export default {
         fn();
       }, wait);
     },
-    // 添加货物信息(打开添加框)
-    addOpen() {
-      if (this.formData.customer_info != "") {
-        this.addForm.customer_id = this.formData.customer_info;
-      }
-      this.addDV = true;
-    },
-    // 提交货品信息
-    addSubmit() {
-      // 对货品添加列表进行校验，如果有漏填项则提示
-      for (let key in this.addForm) {
-        if (key == "box_code") {
-          continue;
-        }
-        if (this.addForm[key] == "") {
-          this.$message.error(`存在漏缺项--${this.louqueForm[key]}--`);
-          return;
-        }
-      }
-      this.addForm.box_code = Math.floor(Math.random() * 8999 + 1000);
-      this.$http({
-        method: "post",
-        url: "api/insert/insertBox",
-        data: this.addForm,
-      })
-        .then((res) => {
-          this.$message.success("添加成功!");
-          this.refreshGetBox();
-          this.addDV = false;
+    // 删除提交
+    deleteSubmit() {
+      this.$confirm("确定删除客户信息?")
+        .then(() => {
+          this.solidSelection = this.multipleSelection;
+          while (this.solidSelection.length != 0) {
+            this.deleteProduct();
+            this.solidSelection.shift();
+          }
+          this.$message.success("删除客户信息成功!");
         })
-        .catch((err) => {});
+        .catch((err) => {
+          this.$message.warning("取消删除");
+        });
     },
-    // 检查货品信息中客户id是否已存在的接口方法
-    checkCustomerId() {
+    // 删除货物信息
+    deleteProduct() {
       this.$http({
         method: "post",
-        url: "api/query/getCustomerId",
+        url: "api/delete/deleteProduct",
         data: {
-          customer_id: this.addForm.customer_id,
+          customer_id: this.solidSelection[0].customer_id,
+          product_code: this.solidSelection[0].product_code,
         },
       })
         .then((res) => {
-          if (res.data.length == 0) {
-            this.$message.warning(`不存在编号为${this.addForm.customer_id}的客户，请重新输入！`);
-          } else {
-            this.addSubmit();
-          }
+          this.refreshFormSearch();
         })
-        .catch((err) => {});
+        .catch((err) => {
+          this.$message.error(err);
+        });
     },
   },
   watch: {
@@ -406,29 +322,6 @@ export default {
           this.locateReqData = { company_name: nV.customer_info };
         }
         this.debounce(this.getData, 1000);
-      },
-      deep: true,
-    },
-    addForm: {
-      handler: function(nV, oV) {
-        // nV.save_days = nV.come_time;
-
-        // 获取库存天数
-        if (this.addForm.come_time != "") {
-          var a1 = Date.parse(new Date(nV.come_time));
-          var a2 = Date.parse(new Date(this.today_date));
-          var day = parseInt((a2 - a1) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
-          nV.save_days = day + 1;
-        }
-
-        // 根据规格获取重量
-        if (this.addForm.length_width_height.length > 4) {
-          let lwhArr = this.addForm.length_width_height.split("*");
-          if (lwhArr.length == 3) {
-            let result = Math.floor((lwhArr[0] * lwhArr[1] * lwhArr[2]) / 6000 / 0.452);
-            this.addForm.weight = result;
-          }
-        }
       },
       deep: true,
     },
@@ -448,9 +341,6 @@ export default {
 
     this.refreshFormSearch();
   },
-  created() {
-    let that = this;
-  },
     created() {
       if (sessionStorage.getItem("userLevel") == "管理员") {   
     } else {
@@ -460,12 +350,4 @@ export default {
   }
 };
 </script>
-
-<style lang="less" scoped>
-.productPage-addForm {
-  margin-top: -95px;
-  /deep/ .el-form-item__error {
-    padding-left: 20px;
-  }
-}
-</style>
+<style lang="less" scoped></style>

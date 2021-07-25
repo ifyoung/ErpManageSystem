@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
 import Login from "../views/login.vue";
+import Welcome from "../views/welcome.vue";
 import PayCenter from "../views/payCenter.vue";
 import ProductCome from "../views/productManage/productCome";
 import ProductList from "../views/productManage/productList";
@@ -13,13 +14,18 @@ import BoxList from "../views/boxManage/boxList";
 import BoxOut from "../views/boxManage/boxOut";
 import BoxOutList from "../views/boxManage/boxOutList";
 
-import PossessSystem from '../views/possessSystem/possessSystem'
+import CusProductList from "../views/customer/cusProductList";
+import CusBoxList from "../views/customer/cusBoxList";
 
-import NoticeCenter from '../views/noticeCenter'
+import PossessSystem from "../views/possessSystem/possessSystem";
 
-import CustomerManage from '../views/customerManage/customerManage'
+// import ProductOrderCenter from '../views/orderCenter/productOrderCenter'
+// import BoxOrderCenter from '../views/orderCenter/boxOrderCenter'
+import OrderCenter from "../views/orderCenter/orderCenter";
 
-import OutRecord from '../views/outRecord'
+import CustomerManage from "../views/customerManage/customerManage";
+
+import OutRecord from "../views/outRecord";
 Vue.use(VueRouter);
 
 const routes = [
@@ -34,12 +40,24 @@ const routes = [
     component: Home,
     children: [
       {
+        path: "/",
+        component: Welcome,
+      },
+      {
         path: "/payCenter",
         component: PayCenter,
       },
+      // {
+      //   path: "/productOrderCenter",
+      //   component: ProductOrderCenter,
+      // },
+      // {
+      //   path: "/boxOrderCenter",
+      //   component: BoxOrderCenter,
+      // },
       {
-        path: "/noticeCenter",
-        component: NoticeCenter,
+        path: "/orderCenter",
+        component: OrderCenter,
       },
       {
         path: "/productCome",
@@ -49,7 +67,6 @@ const routes = [
         path: "/productList",
         component: ProductList,
       },
-
       {
         path: "/productOut",
         component: ProductOut,
@@ -85,8 +102,16 @@ const routes = [
       },
       {
         path: "/outRecord",
-        component:OutRecord,
-      }
+        component: OutRecord,
+      },
+      {
+        path: "/cusProductList",
+        component: CusProductList,
+      },
+      {
+        path: "/cusBoxList",
+        component: CusBoxList,
+      },
     ],
   },
 ];

@@ -162,6 +162,7 @@
 
 <script>
 import { utcToCst } from "../../utils/utcToCst";
+import { getNowFormatDate } from "../../utils/getCurrentTime";
 export default {
   data() {
     return {
@@ -304,14 +305,12 @@ export default {
 
     // 获取箱子信息
     getBox() {
-      this.loading = true;
       this.$http({
         method: "post",
         url: this.boxReqUrl,
         data: this.boxReqData,
       })
         .then((res) => {
-          this.loading = false;
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -552,6 +551,13 @@ export default {
   created() {
     let that = this;
   },
+    created() {
+      if (sessionStorage.getItem("userLevel") == "管理员") {   
+    } else {
+     this.$message.warning("你没有权限使用此功能!");
+      this.$router.push("/home");
+    }
+  }
 };
 </script>
 

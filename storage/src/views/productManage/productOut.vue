@@ -81,6 +81,8 @@ import { getNowFormatDate } from "../../utils/getCurrentTime";
 export default {
   data() {
     return {
+      user:"", // 身份
+      level: "",
       times: 0, // 监听计数
       timer: null,
         loading:false, // 加载标识，默认为false,当调用接口时赋值为true
@@ -308,6 +310,7 @@ export default {
           out_count: row.count,
           record_code: random,
           status:"false",
+          out_source:this.level,
         },
       })
         .then((res) => {
@@ -376,6 +379,15 @@ export default {
 
     this.refreshGetAllProduct();
   },
+    created() {
+      this.user = sessionStorage.getItem("userName")
+      this.level = sessionStorage.getItem("userLevel");
+      if (sessionStorage.getItem("userLevel") == "管理员") {   
+    } else {
+     this.$message.warning("你没有权限使用此功能!");
+      this.$router.push("/");
+    }
+  }
 };
 </script>
 

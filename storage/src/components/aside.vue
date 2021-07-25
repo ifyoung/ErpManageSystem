@@ -27,27 +27,38 @@
           background-color="#3c3f42"
           active-text-color="#ffd04b"
         >
-          <el-menu-item index="/noticeCenter">
-            <i class="el-icon-message-solid"></i>
-            <span class="menu-title">订单中心</span>
+          <el-menu-item :style="{ display: userLevel == '客户' ? 'block' : 'none' }" index="/cusProductList">
+            <i class="el-icon-takeaway-box"></i>
+            <span class="menu-title">货品清单</span>
           </el-menu-item>
-          <el-menu-item index="/payCenter">
+          <el-menu-item :style="{ display: userLevel == '客户' ? 'block' : 'none' }" index="/cusBoxList">
+            <i class="el-icon-box"></i>
+            <span class="menu-title">箱子清单</span>
+          </el-menu-item>
+
+          <el-menu-item :style="{ display: userLevel == '管理员' ? 'block' : 'none' }" index="/payCenter">
             <i class="el-icon-bank-card"></i>
             <span class="menu-title">费用中心</span>
           </el-menu-item>
-          <el-menu-item index="/customerManage">
+          <el-menu-item :style="{ display: userLevel == '管理员' ? 'block' : 'none' }" index="/customerManage">
             <i class="el-icon-user"></i>
             <span class="menu-title">客户管理</span>
           </el-menu-item>
-          <el-menu-item index="/possessSystem">
-            <i style="padding-left:5px;padding-right:16.9px;font-size:19px;">$</i>
+          <el-menu-item :style="{ display: userLevel == '管理员' ? 'block' : 'none' }" index="/possessSystem">
+            <i style="padding-left:5px;padding-right:12.9px;font-size:19px;">$</i>
             <span class="menu-title">财务系统</span>
           </el-menu-item>
-          <el-menu-item index="/outRecord">
+          <el-menu-item :style="{ display: userLevel == '管理员' ? 'block' : 'none' }" index="/outRecord">
             <i class="el-icon-s-order"></i>
             <span class="menu-title">出库记录</span>
           </el-menu-item>
-          <el-submenu index="1">
+
+<el-menu-item :style="{ display: userLevel == '管理员' ? 'block' : 'none' }" index="/orderCenter">
+            <i class="el-icon-s-promotion"></i>
+            <span class="menu-title">代发中心</span>
+          </el-menu-item>
+
+          <el-submenu :style="{ display: userLevel == '管理员' ? 'block' : 'none' }" index="2">
             <template slot="title">
               <i class="el-icon-s-goods"></i>
               <span class="menu-title">货品管理</span>
@@ -59,7 +70,7 @@
               <el-menu-item index="/productOutList">出库清单</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
-          <el-submenu index="2">
+          <el-submenu :style="{ display: userLevel == '管理员' ? 'block' : 'none' }" index="3">
             <template slot="title">
               <i class="el-icon-box"></i>
               <span class="menu-title">箱子管理</span>
@@ -104,7 +115,7 @@ export default {
         });
     },
   },
-  mounted() {
+  created() {
     console.log(sessionStorage.getItem("userName"));
     if (sessionStorage.getItem("userName") == null && sessionStorage.getItem("userLevel") == null) {
       this.$message.warning("请先登录用户");

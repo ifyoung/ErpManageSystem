@@ -1,7 +1,7 @@
 <template>
   <div class="header-container">
     <div class="module-title">
-      <h1>出库记录</h1>
+      <h1>代发中心</h1>
     </div>
 
     <div class="content-container">
@@ -44,13 +44,14 @@
             ref="multipleTable"
           >
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
-            <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
-            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
-            <el-table-column align="center" label="名称" prop="product_name" width="270px"></el-table-column>
-            <el-table-column align="center" label="货品SKU" prop="product_sku"></el-table-column>
-            <el-table-column align="center" label="出库时间" prop="out_time"></el-table-column>
-            <el-table-column align="center" label="出库数量" prop="out_count"></el-table-column>
-             <el-table-column align="center" label="操作者" prop="out_source"></el-table-column>
+            <el-table-column align="center" label="客户名称" prop="customer_id"></el-table-column>
+            <el-table-column align="center" label="产品" prop="product_name" width="270px"></el-table-column>
+            <el-table-column align="center" label="下单数量" prop="out_count"></el-table-column>
+            <el-table-column align="center" label="地址">
+              <template slot-scope="scope">
+                <el-link type="primary" style="font-size:16px" @mouseover.native="showAddress(scope)">查看详情</el-link>
+              </template>
+            </el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -76,11 +77,82 @@
         </el-col>
       </el-row>
     </div>
+
+    <el-dialog title="-添加客户信息-" class="cus-dialog-style" :visible.sync="addDV" width="55%" :before-close="handleClose">
+      <el-form v-model="addressForm" ref="addressForm" label-width="340px">
+        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+          <el-form-item required label="买家地址 Enter customer address:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addressForm.customer_address"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+          <el-form-item required label="全名 Full name:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addressForm.full_name"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+          <el-form-item required label="街道地址1 Street address1:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addressForm.street_address1"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+          <el-form-item required label="街道地址2 Street address2:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addressForm.street_address2"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+          <el-form-item required label="城市 City:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addressForm.city"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+          <el-form-item required label="州/省 State/Province:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addressForm.province"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+          <el-form-item required label="邮编 Zip / Postal code:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addressForm.zip"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+          <el-form-item label="手机电话(可选) Phone number:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addressForm.phone_number"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:15px">
+          <el-form-item label="邮箱地址(可选) Email address:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addressForm.email_address"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" plain @click="addDV = false">取 消</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { utcToCst } from "../utils/utcToCst";
+import { utcToCst } from "../../utils/utcToCst";
 export default {
   data() {
     return {
@@ -95,6 +167,22 @@ export default {
       locateReqUrl: "/api/query/getLocateCustomerId", // 模糊查询地址
       locateReqData: {}, // 模糊查询客户信息
       nameTipsArray: [], // 提醒下拉框
+      addDV: false,
+      addressForm: {
+        // 添加列表
+        customer_address: "", //客户地址
+        full_name: "", // 地址全称
+        street_address1: "", // 街道地址1
+        street_address2: "", // 街道地址2
+        city: "", // 城市
+        province: "", // 省份
+        zip: "", // 邮编
+        phone_number: "", // 手机电话
+        email_address: "", // 邮箱地址
+        product_code: "", // 货品码
+        box_code: "", // 箱子码
+        record_code: "", // 记录码
+      },
       formData: {
         // 查询列表
         customer_info: "", // 客户信息,
@@ -181,7 +269,8 @@ export default {
             this.queryResData = [];
             this.$message.success("查询成功");
             for (let item of res.data) {
-              if (item.status == "true") {
+              console.log(item.out_source);
+              if (item.status == "true" || item.out_source != "客户") {
                 continue;
               } else {
                 item.out_time = utcToCst(item.out_time)
@@ -212,7 +301,7 @@ export default {
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
-              if (item.status == "true") {
+              if (item.status == "true" || item.out_source != "客户") {
                 continue;
               } else {
                 item.out_time = utcToCst(item.out_time)
@@ -241,7 +330,7 @@ export default {
           console.log(res);
           this.queryResData = [];
           for (let item of res.data) {
-            if (item.status == "true") {
+            if (item.status == "true" || item.out_source != "客户") {
               // 如果状态显示已出库，则不显示在出库记录中，跳过此循环
               continue;
             } else {
@@ -264,7 +353,9 @@ export default {
           this.solidSelection = this.multipleSelection;
           while (this.solidSelection.length != 0) {
             this.withdrawOutRecord();
+
             // this.deleteOutRecord();
+            // this.deleteAddress(); //删除地址记录
             this.solidSelection.shift();
           }
           this.$message.success("删除出库记录信息成功!");
@@ -327,6 +418,41 @@ export default {
         });
     },
 
+    // 显示选定行地址
+    showAddress(scope) {
+      console.log(scope);
+
+      this.debounce(this.getAddress(scope),1000)
+    },
+
+    //获取地址
+    getAddress(scope) {
+      this.$http({
+        method: "post",
+        url: "api/query/getAddress",
+        data: {
+          record_code: scope.row.record_code,
+        },
+      })
+        .then((res) => {
+          console.log(res);
+          this.addressForm = res.data[0];
+          
+          setTimeout( ()=>{
+               this.addDV = true;
+          },200)
+       
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+
+    handleClose() {
+      this.addressForm = {};
+      this.addDV = false;
+    },
     // 监听输入框，有变动就触发防抖函数
     getData() {
       this.$http({
@@ -398,7 +524,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.productPage-addForm {
+.productPage-addressForm {
   margin-top: -80px;
   /deep/ .el-form-item__error {
     padding-left: 20px;
@@ -408,5 +534,13 @@ export default {
   display: inline-block;
   margin-left: -15px;
   min-width: 90px;
+}
+.cus-dialog-style {
+  /deep/ .el-dialog {
+    margin-top: 1vh !important;
+  }
+  .el-input {
+    width: 300px !important;
+  }
 }
 </style>

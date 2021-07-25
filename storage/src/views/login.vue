@@ -1,6 +1,5 @@
 <template>
   <div class="login-page">
-    <div class="login-title"></div>
 
     <div class="login-container">
       <div class="login-form login-form_opcity">
@@ -30,10 +29,18 @@
               </el-col>
             </el-row>
           </el-form>
+          <el-row class="transform-row" style="text-align:right">
+            <el-col class="check-label">
+              <el-radio v-model="checkFlag" label="管理员">管理员</el-radio>
+              <el-radio v-model="checkFlag" label="客户">客户</el-radio>
+            </el-col>
+          </el-row>
           <el-button class="login-button" @click="login">登录</el-button>
         </div>
       </div>
     </div>
+    
+    <div class="beian">闽ICP备2021010384号-1</div>
   </div>
 </template>
 
@@ -41,6 +48,8 @@
 export default {
   data() {
     return {
+      checkFlag: "管理员", // 登录时检测的标识，根据标识切换 检测账号是否存在 的接口-----manager/cutomer
+      url: "", // 监听url，根据身份而变化接口
       loginForm: {
         user: "",
         password: "",
@@ -71,9 +80,17 @@ export default {
         return;
       }
 
+      if (this.checkFlag == "管理员") {
+        this.url = "/api/query/loginInUser";
+      } else {
+        this.url = "/api/query/loginInCustomer";
+      }
+
+      console.log(this.url);
+
       this.$http({
         method: "post",
-        url: "/api/query/login",
+        url: this.url,
         data: {
           username: this.loginForm.user,
           password: this.loginForm.password,
@@ -94,9 +111,16 @@ export default {
              * 在会话存储里，存储用户名和
              *
              */
-            sessionStorage.setItem("userName", res.data[0].username);
-            sessionStorage.setItem("userId", res.data[0].id);
-            sessionStorage.setItem("userLevel", res.data[0].level);
+            if (this.checkFlag == "管理员") {
+              sessionStorage.setItem("userName", res.data[0].username);
+              sessionStorage.setItem("userId", res.data[0].id);
+              sessionStorage.setItem("userLevel", res.data[0].level);
+            } else {
+              sessionStorage.setItem("userName", res.data[0].customer_id);
+              sessionStorage.setItem("userId", "-");
+              sessionStorage.setItem("userLevel", "客户");
+            }
+
             // this.$store.dispatch("setUser", [res.data[0].username, res.data[0].id, res.data[0].level]);
             this.$router.push("/home");
           }, 200);
@@ -105,12 +129,10 @@ export default {
           this.$message.error(err);
         });
     },
-    toRegister() {
-      this.$router.push("/register");
-    },
   },
-  mounted() {
-    
+  mounted() {},
+  created() {
+    sessionStorage.clear();
   },
 };
 </script>
@@ -122,7 +144,7 @@ export default {
   padding: 0px;
   width: 100%;
   height: 100%;
-    background: url("../assets/login.jpg") no-repeat;
+  background: url("../assets/login.jpg") no-repeat;
   background-size: 100% 100%;
   position: fixed;
   top: 0;
@@ -193,7 +215,6 @@ export default {
           border-radius: 5%;
         }
         /deep/ .el-input__inner {
-          width: 330px !important;
           height: 50px;
           font-size: 20px !important;
           border-radius: 1%;
@@ -241,8 +262,25 @@ export default {
       }
     }
   }
+  .check-label {
+    /deep/ .el-radio__input.is-checked + .el-radio__label {
+      color: rgb(12, 59, 52);
+      font-weight: bold;
+    }
+  }
+  .transform-row {
+    transform: translateY(30px);
+  }
   /deep/ .el-form-item__label {
     font-size: 23px !important;
+  }
+  .beian{
+    display:fixed;
+    position:absolute;
+    color:black;
+    font-size:25px;
+    bottom:4%;
+    left:40%;
   }
 }
 </style>

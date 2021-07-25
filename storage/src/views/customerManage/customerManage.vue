@@ -5,7 +5,7 @@
     </div>
     <div class="content-container">
       <el-row>
-        <el-col class="customer-table" :span="14">
+        <el-col class="customer-table" :span="15">
           <el-table
            height="435"
             v-loading="loading"
@@ -18,11 +18,12 @@
             <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
             <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
             <el-table-column align="center" label="首次入库时间" prop="first_come_time"></el-table-column>
+            <el-table-column align="center" label="自生成密码" prop="auto_pwd"></el-table-column>
           </el-table>
         </el-col>
       </el-row>
       <el-row type="flex" class="padding_tb">
-        <el-col :span="14">
+        <el-col :span="15">
           <el-pagination
             class="customer-pagination"
             :background="true"
@@ -38,7 +39,7 @@
         </el-col>
       </el-row>
       <el-row type="flex" class="padding_tb padding_lr">
-        <el-col :span="10">
+        <el-col :span="11">
           <el-button class="add-btn" @click="addCustomer">添加</el-button>
         </el-col>
         <el-col :span="2">
@@ -203,6 +204,7 @@ export default {
           company_name: this.addForm.company_name, // 公司名称
           first_come_time: this.addForm.first_come_time, // 首次入库日期
           leave_amount: "0", // 剩余金额
+          auto_pwd:String(Math.floor(Math.random()*1000+8999)), // 随机生产的客户密码
         },
       })
         .then((res) => {
@@ -258,6 +260,13 @@ export default {
       return this.queryResData.slice((this.queryPage.currentPage - 1) * this.queryPage.pageSize, this.queryPage.currentPage * this.queryPage.pageSize);
     },
   },
+    created() {
+      if (sessionStorage.getItem("userLevel") == "管理员") {   
+    } else {
+     this.$message.warning("你没有权限使用此功能!");
+     this.$router.push('/home')
+    }
+  }
 };
 </script>
 

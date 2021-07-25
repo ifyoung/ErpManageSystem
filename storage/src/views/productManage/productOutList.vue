@@ -317,6 +317,13 @@ export default {
     var today_date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
     this.today_date = today_date;
   },
+    created() {
+      if (sessionStorage.getItem("userLevel") == "管理员") {   
+    } else {
+     this.$message.warning("你没有权限使用此功能!");
+      this.$router.push("/");
+    }
+  }
 };
 </script>
 

@@ -10,7 +10,7 @@
           <el-form :model="formData" ref="formData" label-width="100px" label-position="left">
             <el-form-item label="客户信息:" prop="customer_info">
               <el-autocomplete
-                 style="width:100%"
+                style="width:100%"
                 v-model="formData.customer_info"
                 :fetch-suggestions="querySearch"
                 clearable
@@ -29,13 +29,20 @@
       </el-row>
       <el-row style="padding-top:20px">
         <el-col class="customer-table" :span="24">
-             <el-table  height="445"
+          <el-table
+            height="445"
             v-loading="loading"
             element-loading-text="加载中..."
             element-loading-custom-class="loading_color"
             element-loading-spinner="el-icon-loading"
             element-loading-background="rgba(0, 0, 0, 0.5)"
-           @selection-change="handleSelectionChange" :row-style="showRow" border stripe :data="computedQueryResData" ref="multipleTable">
+            @selection-change="handleSelectionChange"
+            :row-style="showRow"
+            border
+            stripe
+            :data="computedQueryResData"
+            ref="multipleTable"
+          >
             <!-- <el-table-column align="center" type="selection" width="100px"></el-table-column> -->
             <el-table-column align="center" label="客户编号" prop="customer_id" width="150px"></el-table-column>
             <el-table-column align="center" label="公司名称" prop="company_name" width="150px"></el-table-column>
@@ -83,9 +90,11 @@ import { getNowFormatDate } from "../../utils/getCurrentTime";
 export default {
   data() {
     return {
+      user: "", // 客户编号
+      level: "", // 权限身份
       times: 0, // 监听计数
       timer: null,
-        loading:false, // 加载标识，默认为false,当调用接口时赋值为true
+      loading: false, // 加载标识，默认为false,当调用接口时赋值为true
       today_date: "", // 今天的日期
       pickerOption: {
         disabledDate: (time) => {
@@ -194,14 +203,14 @@ export default {
 
     // 获取箱子信息
     getBox() {
-      this.loading = true
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.boxReqUrl,
         data: this.boxReqData,
       })
         .then((res) => {
-          this.loading = false
+          this.loading = false;
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -237,14 +246,14 @@ export default {
         this.boxReqUrl = "/api/query/getBoxByCompanyName";
         this.boxReqData = { company_name: this.formData.customer_info };
       }
-this.loading = true
+      this.loading = true;
       this.$http({
         method: "post",
         url: this.boxReqUrl,
         data: this.boxReqData,
       })
         .then((res) => {
-          this.loading = false
+          this.loading = false;
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
@@ -347,7 +356,7 @@ this.loading = true
         .then(() => {
           row.out_count = String(Number(row.out_count) + Number(row.operateCount));
           let data = {};
-          let record_code =String(Math.floor(Math.random()*1000+8999));
+          let record_code = String(Math.floor(Math.random() * 1000 + 8999));
           for (let name in row) {
             if (name == "operateCount") {
               continue;
@@ -356,8 +365,8 @@ this.loading = true
           }
           data.out_time = getNowFormatDate();
 
-          this.updateBox(data,record_code);
-          this.insertOutRecord(data, row,record_code);
+          this.updateBox(data, record_code);
+          this.insertOutRecord(data, row, record_code);
         })
         .catch((err) => {
           console.log(err);
@@ -380,7 +389,7 @@ this.loading = true
     },
 
     // 添加 出库记录 信息
-    insertOutRecord(data, row,random) {
+    insertOutRecord(data, row, random) {
       this.$http({
         method: "post",
         url: "api/insert/insertOutRecord",
@@ -391,7 +400,8 @@ this.loading = true
           out_time: data.out_time,
           out_count: row.operateCount,
           record_code: random,
-          status:"false",
+          status: "false",
+          out_source: this.level,
         },
       })
         .then((res) => {
@@ -455,7 +465,14 @@ this.loading = true
     this.refreshGetBox();
   },
   created() {
+      this.user = sessionStorage.getItem("userName");
+      this.level = sessionStorage.getItem("userLevel");
     let that = this;
+    if (sessionStorage.getItem("userLevel") == "管理员") {
+    } else {
+      this.$message.warning("你没有权限使用此功能!");
+      this.$router.push("/");
+    }
   },
 };
 </script>

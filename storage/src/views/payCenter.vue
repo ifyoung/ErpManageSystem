@@ -641,6 +641,13 @@ export default {
 
     this.refreshFormSearch();
   },
+    created() {
+      if (sessionStorage.getItem("userLevel") == "管理员") {   
+    } else {
+     this.$message.warning("你没有权限使用此功能!");
+      this.$router.push("/");
+    }
+  }
 };
 </script>
 
