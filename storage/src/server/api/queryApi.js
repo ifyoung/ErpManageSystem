@@ -1,7 +1,7 @@
 var express = require("express"); // express框架
 var router = express.Router();
 var $sql = require("../sqlMap"); // sql语句
-var conn = require("../conn") // 引用封装的mysql.js
+var conn = require("../conn"); // 引用封装的mysql.js
 
 var jsonWrite = function(res, ret) {
   if (typeof ret === "undefined") {
@@ -139,7 +139,7 @@ router.post("/getOutRecordByCompanyName", (req, res) => {
   });
 });
 
-// 根据客户编号获取 箱子 信息
+// (时间排序)根据客户编号获取 箱子 信息
 router.post("/getBoxByCustomerId", (req, res) => {
   var sql = $sql.query.getBoxByCustomerId;
   var parms = req.body;
@@ -154,7 +154,7 @@ router.post("/getBoxByCustomerId", (req, res) => {
   });
 });
 
-// 根据客户所属公司获取 箱子 信息
+// (时间排序)根据客户所属公司获取 箱子 信息
 router.post("/getBoxByCompanyName", (req, res) => {
   var sql = $sql.query.getBoxByCompanyName;
   var parms = req.body;
@@ -169,12 +169,12 @@ router.post("/getBoxByCompanyName", (req, res) => {
   });
 });
 
-// 获取所有 箱子 信息
-router.post("/getAllBox", (req, res) => {
-  var sql = $sql.query.getAllBox;
+// (名称排序)根据客户编号获取 箱子 信息
+router.post("/getBoxByCustomerIdByName", (req, res) => {
+  var sql = $sql.query.getBoxByCustomerIdByName;
   var parms = req.body;
   console.log(parms);
-  conn.query(sql, [], function(err, result) {
+  conn.query(sql, [parms.customer_id], function(err, result) {
     if (err) {
       console.log(err);
     }
@@ -184,12 +184,27 @@ router.post("/getAllBox", (req, res) => {
   });
 });
 
-// 获取所有 交易 信息
-router.post("/getAllTrading", (req, res) => {
-  var sql = $sql.query.getAllTrading;
+// (名称排序)根据客户所属公司获取 箱子 信息
+router.post("/getBoxByCompanyNameByName", (req, res) => {
+  var sql = $sql.query.getBoxByCompanyNameByName;
   var parms = req.body;
   console.log(parms);
-  conn.query(sql, [], function(err, result) {
+  conn.query(sql, [parms.company_name], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (公司名称排序)获取所有 交易 信息
+router.post("/getTradingLocate", (req, res) => {
+  var sql = $sql.query.getTradingLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
     if (err) {
       console.log(err);
     }
@@ -213,7 +228,7 @@ router.post("/getAllOutRecord", (req, res) => {
     }
   });
 });
-// 根据客户编号获取货物信息
+// (时间排序)根据客户编号获取货物信息
 router.post("/getProductByCustomerId", (req, res) => {
   var sql = $sql.query.getProductByCustomerId;
   var parms = req.body;
@@ -228,7 +243,7 @@ router.post("/getProductByCustomerId", (req, res) => {
   });
 });
 
-// 根据客户所属公司获取货物信息
+// (时间排序)根据客户所属公司获取货物信息
 router.post("/getProductByCompanyName", (req, res) => {
   var sql = $sql.query.getProductByCompanyName;
   var parms = req.body;
@@ -243,12 +258,27 @@ router.post("/getProductByCompanyName", (req, res) => {
   });
 });
 
-// 获取所有货物信息
-router.post("/getAllProduct", (req, res) => {
-  var sql = $sql.query.getAllProduct;
+// (名称排序)根据客户编号获取货物信息
+router.post("/getProductByCustomerIdByName", (req, res) => {
+  var sql = $sql.query.getProductByCustomerIdByName;
   var parms = req.body;
   console.log(parms);
-  conn.query(sql, [], function(err, result) {
+  conn.query(sql, [parms.customer_id], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (名称排序)根据客户所属公司获取货物信息
+router.post("/getProductByCompanyNameByName", (req, res) => {
+  var sql = $sql.query.getProductByCompanyNameByName;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.company_name], function(err, result) {
     if (err) {
       console.log(err);
     }
@@ -263,14 +293,18 @@ router.post("/getSameSku", (req, res) => {
   var sql = $sql.query.getSameSku;
   var parms = req.body;
   console.log(parms);
-  conn.query(sql, [parms.customer_id, parms.product_name, parms.product_sku], function(err, result) {
-    if (err) {
-      console.log(err);
+  conn.query(
+    sql,
+    [parms.customer_id, parms.product_name, parms.product_sku],
+    function(err, result) {
+      if (err) {
+        console.log(err);
+      }
+      if (result) {
+        res.send(result);
+      }
     }
-    if (result) {
-      res.send(result);
-    }
-  });
+  );
 });
 
 // 根据客户id获取剩余金额信息
@@ -333,9 +367,39 @@ router.post("/getRechargeByCompanyName", (req, res) => {
   });
 });
 
-// 根据客户id获取交易信息
-router.post("/getTradingByCustomerId", (req, res) => {
-  var sql = $sql.query.getTradingByCustomerId;
+// (公司名称排序)获取交易信息
+router.post("/getTradingByName", (req, res) => {
+  var sql = $sql.query.getTradingByName;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// 获取地址表信息，根据 记录码
+router.post("/getAddress", (req, res) => {
+  var sql = $sql.query.getAddress;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.record_code], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// 获取客户id获取指定客户信息
+router.post("/getSpecificCustomer", (req, res) => {
+  var sql = $sql.query.getSpecificCustomer;
   var parms = req.body;
   console.log(parms);
   conn.query(sql, [parms.customer_id], function(err, result) {
@@ -348,12 +412,12 @@ router.post("/getTradingByCustomerId", (req, res) => {
   });
 });
 
-// 根据客户所属公司获取交易信息
-router.post("/getTradingByCompanyName", (req, res) => {
-  var sql = $sql.query.getTradingByCompanyName;
+// (货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getProductLocate", (req, res) => {
+  var sql = $sql.query.getProductLocate;
   var parms = req.body;
   console.log(parms);
-  conn.query(sql, [parms.company_name], function(err, result) {
+  conn.query(sql, [parms.customer_info], function(err, result) {
     if (err) {
       console.log(err);
     }
@@ -363,13 +427,176 @@ router.post("/getTradingByCompanyName", (req, res) => {
   });
 });
 
-// 获取地址表信息，根据 记录码
-
-router.post("/getAddress", (req, res) => {
-  var sql = $sql.query.getAddress;
+// (时间排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getProductLocateByTime", (req, res) => {
+  var sql = $sql.query.getProductLocateByTime;
   var parms = req.body;
   console.log(parms);
-  conn.query(sql, [parms.record_code], function(err, result) {
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (名称排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getProductLocateByName", (req, res) => {
+  var sql = $sql.query.getProductLocateByName;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getBoxLocate", (req, res) => {
+  var sql = $sql.query.getBoxLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (时间排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getBoxLocateByTime", (req, res) => {
+  var sql = $sql.query.getBoxLocateByTime;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (名称排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getBoxLocateByName", (req, res) => {
+  var sql = $sql.query.getBoxLocateByName;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (出库记录)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getOutRecordLocate", (req, res) => {
+  var sql = $sql.query.getOutRecordLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (出库记录)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getOutRecordLocate", (req, res) => {
+  var sql = $sql.query.getOutRecordLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (出库记录)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getOutRecordLocate", (req, res) => {
+  var sql = $sql.query.getOutRecordLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (时间排序)(出库记录)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getOutRecordLocateByTime", (req, res) => {
+  var sql = $sql.query.getOutRecordLocateByTime;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// 客户信息模糊查询
+router.post("/getCustomerDialogLocate", (req, res) => {
+  var sql = $sql.query.getCustomerDialogLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// 货物信息模糊查询
+router.post("/getProductDialogLocate", (req, res) => {
+  var sql = $sql.query.getProductDialogLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+// 箱子信息模糊查询
+router.post("/getBoxDialogLocate", (req, res) => {
+  var sql = $sql.query.getBoxDialogLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
     if (err) {
       console.log(err);
     }

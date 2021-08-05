@@ -7,7 +7,12 @@
     <div class="content-container">
       <el-row>
         <el-col :span="10">
-          <el-form :model="formData" ref="formData" label-width="100px" label-position="left">
+          <el-form
+            :model="formData"
+            ref="formData"
+            label-width="100px"
+            label-position="left"
+          >
             <el-form-item label="客户信息:" prop="customer_info">
               <el-autocomplete
                 style="width:100%"
@@ -27,10 +32,10 @@
           <el-button type="info" @click="resetForm('formData')">重置</el-button>
         </el-col>
       </el-row>
-      <el-row style="padding-top:20px">
+      <el-row>
         <el-col class="customer-table" :span="24">
           <el-table
-            height="445"
+            :height="tableHeight"
             v-loading="loading"
             element-loading-text="加载中..."
             element-loading-custom-class="loading_color"
@@ -44,16 +49,59 @@
             ref="multipleTable"
           >
             <!-- <el-table-column align="center" type="selection" width="100px"></el-table-column> -->
-            <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
-            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
-            <el-table-column align="center" label="货品名称" prop="product_name" width="150px"></el-table-column>
-            <el-table-column align="center" label="货品SKU" prop="product_sku" width="150px"></el-table-column>
-            <el-table-column align="center" label="入库时间" prop="come_time" width="100px"></el-table-column>
-            <el-table-column align="center" label="出库时间" prop="out_time"></el-table-column>
-            <el-table-column align="center" label="入仓数量" prop="storage_count"></el-table-column>
-            <el-table-column align="center" label="剩余数量" prop="leave_count"></el-table-column>
-            <el-table-column align="center" label="仓储天数" prop="save_days"></el-table-column>
-            <el-table-column align="center" label="出库数量" prop="out_count"></el-table-column>
+            <el-table-column
+              align="center"
+              label="客户编号"
+              prop="customer_id"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="公司名称"
+              prop="company_name"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="货品名称"
+              prop="product_name"
+              width="150px"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="货品SKU"
+              prop="product_sku"
+              width="150px"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="入库时间"
+              prop="come_time"
+              width="130"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="出库时间"
+              prop="out_time"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="入仓数量"
+              prop="storage_count"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="剩余数量"
+              prop="leave_count"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="仓储天数"
+              prop="save_days"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="出库数量"
+              prop="out_count"
+            ></el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -78,10 +126,12 @@
 </template>
 
 <script>
-import { utcToCst } from "../../utils/utcToCst";
+import { utcToCst } from "@/utils/utcToCst";
+import { getNowFormatDate } from "@/utils/getCurrentTime";
 export default {
   data() {
     return {
+      tableHeight: window.innerHeight * 0.65,
       times: 0, // 监听计数
       timer: null,
       loading: false, // 加载标识，默认为false,当调用接口时赋值为true
@@ -133,17 +183,7 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-        this.productReqUrl = "/api/query/getProductByCustomerId";
-        this.productReqData = { customer_id: this.formData.customer_info };
-        this.getProduct();
-      } else if (this.formData.customer_info == "") {
-        this.getAllProduct();
-      } else {
-        this.productReqUrl = "/api/query/getProductByCompanyName";
-        this.productReqData = { company_name: this.formData.customer_info };
-        this.getProduct();
-      }
+      this.getProduct();
     },
     // 搜索框模糊查询
     querySearch(queruString, cb) {
@@ -159,11 +199,15 @@ export default {
       this.loading = true;
       this.$http({
         method: "post",
-        url: this.productReqUrl,
-        data: this.productReqData,
+        url: "api/query/getProductLocateByTime",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
-          this.loading = false;
+          this.loading = false; this.queryResData=[];
+          this.queryResData = [];
+          console.log(res);
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -175,11 +219,11 @@ export default {
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
               item.count = 0;
-
               item.out_time = utcToCst(item.out_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
-              ileaverage_count = Number(item.storage_count) - Number(item.out_count);
+              item.leave_count =
+                Number(item.storage_count) - Number(item.out_count);
             }
             this.queryResData = res.data;
           } else {
@@ -192,14 +236,17 @@ export default {
     },
 
     // 获取所有的货品信息
-    getAllProduct() {
+    getAllProductByTime() {
       this.loading = true;
       this.$http({
         method: "post",
-        url: "/api/query/getAllProduct",
+        url: "/api/query/getProductLocateByTime",
+        data:{
+          customer_info:this.formData.customer_info,
+        }
       })
         .then((res) => {
-          this.loading = false;
+          this.loading = false; this.queryResData=[];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -215,7 +262,8 @@ export default {
               item.out_time = utcToCst(item.out_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
-              ileaverage_count = Number(item.storage_count) - Number(item.out_count);
+              ileaverage_count =
+                Number(item.storage_count) - Number(item.out_count);
             }
             this.queryResData = res.data;
           } else {
@@ -231,10 +279,13 @@ export default {
       this.loading = true;
       this.$http({
         method: "post",
-        url: "/api/query/getAllProduct",
+        url: "/api/query/getProductLocateByTime",
+        data:{
+          customer_info:this.formData.customer_info
+        }
       })
         .then((res) => {
-          this.loading = false;
+          this.loading = false; this.queryResData=[];
           for (let item of res.data) {
             let come = Date.parse(new Date(item.come_time));
             let today = Date.parse(new Date(this.today_date));
@@ -248,7 +299,8 @@ export default {
             item.out_time = utcToCst(item.out_time)
               .slice(0, 10)
               .replace(/上|下|中|午|晚|早|凌|晨/g, "");
-            item.leave_count = Number(item.storage_count) - Number(item.out_count);
+            item.leave_count =
+              Number(item.storage_count) - Number(item.out_count);
           }
           this.queryResData = res.data;
         })
@@ -261,17 +313,42 @@ export default {
     getData() {
       this.$http({
         method: "post",
-        url: this.locateReqUrl,
-        data: this.locateReqData,
+        url: "api/query/getProductLocate",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
           this.customer_info_list = res.data;
           if (this.formData.customer_info != "") {
             this.nameTipsArray = [];
+            let avoidSameArr = [];
+            // 遍历模糊查询返回的列表,获取包含输入框关键字的字段,添加到历史列表中
+            // 并且,当历史列表已存在相同字段,则跳过此遍历阶段
             for (let item of this.customer_info_list) {
-              let obj = { value: "" };
-              obj.value = String(Object.values(item)[0]);
-              this.nameTipsArray.push(obj);
+              let flag = 0; // 用于标记是否需要跳过
+              // 遍历每个item对象
+              for (let prop in item) {
+                if (
+                  String(item[prop]).indexOf(this.formData.customer_info) != -1
+                ) {
+                  // 对防重数组遍历,若存在与历史列表对象中完全匹配的属性,则跳过此遍历
+                  for (let val of avoidSameArr) {
+                    if (val == item[prop]) {
+                      flag = 1;
+                      break;
+                    }
+                  }
+                  if (flag == 0) {
+                    this.nameTipsArray.push({
+                      value: String(item[prop]),
+                    });
+                    avoidSameArr.push(String(item[prop]));
+                  } else {
+                    continue;
+                  }
+                }
+              }
             }
           }
         })
@@ -314,16 +391,21 @@ export default {
     this.refresh();
     var today = new Date();
     today.setTime(today.getTime());
-    var today_date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+    var today_date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
     this.today_date = today_date;
   },
-    created() {
-      if (sessionStorage.getItem("userLevel") == "管理员") {   
+  created() {
+    if (sessionStorage.getItem("userLevel") == "管理员") {
     } else {
-     this.$message.warning("你没有权限使用此功能!");
+      this.$message.warning("你没有权限使用此功能!");
       this.$router.push("/");
     }
-  }
+  },
 };
 </script>
 

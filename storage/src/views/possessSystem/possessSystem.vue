@@ -6,7 +6,12 @@
     <div class="content-container">
       <el-row>
         <el-col style="width:31%">
-          <el-form :model="formData" ref="formData" label-width="120px" label-position="left">
+          <el-form
+            :model="formData"
+            ref="formData"
+            label-width="120px"
+            label-position="left"
+          >
             <el-form-item label="客户信息" prop="customer_info">
               <el-autocomplete
                 style="width:100%"
@@ -43,7 +48,7 @@
       <el-row style="padding-top:5px">
         <el-col class="customer-table" :span="20">
           <el-table
-            height="445"
+            :height="tableHeight"
             v-loading="loading"
             element-loading-text="加载中..."
             element-loading-custom-class="loading_color"
@@ -56,11 +61,31 @@
             :data="computedQueryResData"
             ref="multipleTable"
           >
-            <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
-            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
-            <el-table-column align="center" label="日期" prop="trading_date"></el-table-column>
-            <el-table-column align="center" label="内容" prop="trading_content"></el-table-column>
-            <el-table-column align="center" label="金额" prop="trading_amount"></el-table-column>
+            <el-table-column
+              align="center"
+              label="客户编号"
+              prop="customer_id"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="公司名称"
+              prop="company_name"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="日期"
+              prop="trading_date"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="内容"
+              prop="trading_content"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="金额"
+              prop="trading_amount"
+            ></el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -85,10 +110,12 @@
 </template>
 
 <script>
-import { utcToCst } from "../../utils/utcToCst";
+import { utcToCst } from "@/utils/utcToCst";
+import { getNowFormatDate } from "@/utils/getCurrentTime";
 export default {
   data() {
     return {
+      tableHeight: window.innerHeight * 0.65,
       loading: false, // 加载标识，默认为false,当调用接口时赋值为true
       queryPage: {
         pageSize: 10,
@@ -171,17 +198,42 @@ export default {
     getData() {
       this.$http({
         method: "post",
-        url: this.locateReqUrl,
-        data: this.locateReqData,
+        url: "api/query/getTradingLocate",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
           this.customer_info_list = res.data;
           if (this.formData.customer_info != "") {
             this.nameTipsArray = [];
+            let avoidSameArr = [];
+            // 遍历模糊查询返回的列表,获取包含输入框关键字的字段,添加到历史列表中
+            // 并且,当历史列表已存在相同字段,则跳过此遍历阶段
             for (let item of this.customer_info_list) {
-              let obj = { value: "" };
-              obj.value = String(Object.values(item)[0]);
-              this.nameTipsArray.push(obj);
+              let flag = 0; // 用于标记是否需要跳过
+              // 遍历每个item对象
+              for (let prop in item) {
+                if (
+                  String(item[prop]).indexOf(this.formData.customer_info) != -1
+                ) {
+                  // 对防重数组遍历,若存在与历史列表对象中完全匹配的属性,则跳过此遍历
+                  for (let val of avoidSameArr) {
+                    if (val == item[prop]) {
+                      flag = 1;
+                      break;
+                    }
+                  }
+                  if (flag == 0) {
+                    this.nameTipsArray.push({
+                      value: String(item[prop]),
+                    });
+                    avoidSameArr.push(String(item[prop]));
+                  } else {
+                    continue;
+                  }
+                }
+              }
             }
           }
         })
@@ -202,26 +254,18 @@ export default {
         this.choose_time = "";
       }
 
-      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-        this.tradingReqUrl = "/api/query/getTradingByCustomerId";
-        this.tradingReqData = { customer_id: this.formData.customer_info };
-      } else if (this.formData.customer_info == "") {
-        this.tradingReqUrl = "/api/query/getAllTrading";
-        this.tradingReqData = {};
-      } else {
-        this.tradingReqUrl = "/api/query/getTradingByCompanyName";
-        this.tradingReqData = { company_name: this.formData.customer_info };
-      }
       this.loading = true;
 
       // if (this.choose_time != "" || this.choose_time != null) {
       this.$http({
         method: "post",
-        url: this.tradingReqUrl,
-        data: this.tradingReqData,
+        url: "api/query/getTradingByName",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
-          this.loading = false;
+          this.loading = false; this.queryResData=[];
           if (res.data.length == 0 && this.choose_time != "") {
             this.$message.warning(`没有查到日期${this.choose_time}的数据`);
             return;
@@ -252,7 +296,9 @@ export default {
               //  如果推进的数据为空，则提示唔该日期数据
               if (this.queryResData.length == 0) {
                 if (this.choose_time != "" && this.choose_time != null) {
-                  this.$message.warning(`没有查到日期${this.choose_time}的数据`);
+                  this.$message.warning(
+                    `没有查到日期${this.choose_time}的数据`
+                  );
                 }
                 return;
               }
@@ -276,33 +322,31 @@ export default {
         this.choose_time = "";
       }
 
-      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-        this.tradingReqUrl = "/api/query/getTradingByCustomerId";
-        this.tradingReqData = { customer_id: this.formData.customer_info };
-      } else if (this.formData.customer_info == "") {
-        this.tradingReqUrl = "/api/query/getAllTrading";
-        this.tradingReqData = {};
-      } else {
-        this.tradingReqUrl = "/api/query/getTradingByCompanyName";
-        this.tradingReqData = { company_name: this.formData.customer_info };
-      }
       this.loading = true;
       this.$http({
         method: "post",
-        url: this.tradingReqUrl,
-        data: this.tradingReqData,
+        url: "api/query/getTradingByName",
+        data:{
+          customer_info:this.formData.customer_info
+        },
       })
         .then((res) => {
           console.log(res);
-          this.loading = false;
-          if (res.data.length == 0 && (this.choose_time != "" || this.choose_time != null)) {
+          this.loading = false; this.queryResData=[];
+          if (
+            res.data.length == 0 &&
+            (this.choose_time != "" || this.choose_time != null)
+          ) {
             this.$message.warning(`没有查到日期${this.choose_time}的数据`);
             return;
-          } else if (res.data.length == 0 && (this.choose_time == "" || this.choose_time == null)) {
+          } else if (
+            res.data.length == 0 &&
+            (this.choose_time == "" || this.choose_time == null)
+          ) {
             this.$message.warning("未查询到相关数据");
             return;
           }
-          this.loading = false;
+          this.loading = false; this.queryResData=[];
           if (res.data.length != 0) {
             for (let item of res.data) {
               item.trading_date = utcToCst(item.trading_date)
@@ -323,7 +367,9 @@ export default {
               //  如果推进的数据为空，则提示唔该日期数据
               if (this.queryResData.length == 0) {
                 if (this.choose_time != "" && this.choose_time != null) {
-                  this.$message.warning(`没有查到日期${this.choose_time}的数据`);
+                  this.$message.warning(
+                    `没有查到日期${this.choose_time}的数据`
+                  );
                 }
                 return;
               }
@@ -347,14 +393,6 @@ export default {
   watch: {
     formData: {
       handler: function(nV, oV) {
-        // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-          this.locateReqUrl = "/api/query/getLocateCustomerId";
-          this.locateReqData = { customer_id: nV.customer_info };
-        } else {
-          this.locateReqUrl = "api/query/getLocateCompanyName";
-          this.locateReqData = { company_name: nV.customer_info };
-        }
         this.debounce(this.getData, 1000);
       },
       deep: true,
@@ -376,13 +414,13 @@ export default {
       );
     },
   },
-    created() {
-      if (sessionStorage.getItem("userLevel") == "管理员") {   
+  created() {
+    if (sessionStorage.getItem("userLevel") == "管理员") {
     } else {
-     this.$message.warning("你没有权限使用此功能!");
+      this.$message.warning("你没有权限使用此功能!");
       this.$router.push("/");
     }
-  }
+  },
 };
 </script>
 

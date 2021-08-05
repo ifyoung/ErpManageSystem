@@ -6,20 +6,19 @@
 
     <div class="content-container">
       <el-row>
-        <el-col :span="6">
+        <el-col style="width:auto">
           <p class="customer_id_style">客户编号:{{ customer_id }}</p>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="3" style="margin-left:2%">
           <el-button :class="[isNoClick == true ? 'disabled-btn' : 'add-btn']" :disabled="isNoClick" @click="addOpen"
             >点击填写地址(勾选后点击,若多选则提交同一地址)</el-button
           >
         </el-col>
-        <el-col :span="4"> </el-col>
       </el-row>
       <el-row>
         <el-col class="customer-table" :span="24">
           <el-table
-            height="550"
+            :height="tableHeight"
             v-loading="loading"
             element-loading-text="加载中..."
             element-loading-custom-class="loading_color"
@@ -67,7 +66,14 @@
       </el-row>
     </div>
 
-    <el-dialog title="-填写地址信息-" class="cus-dialog-style" :visible.sync="addDV" width="55%" :before-close="handleClose">
+    <el-dialog
+      :close-on-click-modal="false"
+      title="-填写地址信息-"
+      class="cus-dialog-style"
+      :visible.sync="addDV"
+      width="55%"
+      :before-close="handleClose"
+    >
       <el-form v-model="addForm" ref="addForm" label-width="340px">
         <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
           <el-form-item required label="买家地址 Enter customer address:">
@@ -77,14 +83,14 @@
           </el-form-item>
         </el-row>
         <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
-          <el-form-item required  label="全名 Full name:">
+          <el-form-item required label="全名 Full name:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.full_name"></el-input>
             </el-col>
           </el-form-item>
         </el-row>
         <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
-          <el-form-item required  label="街道地址1 Street address1:">
+          <el-form-item required label="街道地址1 Street address1:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.street_address1"></el-input>
             </el-col>
@@ -142,11 +148,12 @@
 </template>
 
 <script>
-import { getNowFormatDate } from "../../utils/getCurrentTime";
-import { utcToCst } from "../../utils/utcToCst";
+import { utcToCst } from "@/utils/utcToCst";
+import { getNowFormatDate } from "@/utils/getCurrentTime";
 export default {
   data() {
     return {
+      tableHeight: window.innerHeight * 0.65,
       customer_id: "", // 获取当前登录账号的客户编号
       level: "", // 用户身份
       isNoClick: true, // 禁止添加
@@ -185,7 +192,13 @@ export default {
       queryResData: [], // 查询结果列表
       customer_info_list: [], // 模糊查询列表
       rules: {
-        customer_info: [{ message: "请输入客户信息", required: true, trigger: ["blur", "change"] }],
+        customer_info: [
+          {
+            message: "请输入客户信息",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       queryPage: {
         // 分页器
@@ -240,14 +253,14 @@ export default {
       this.loading = true;
       this.$http({
         method: "post",
-        url: "/api/query/getProductByCustomerId",
+        url: "/api/query/getProductLocateByTime",
         data: {
-          customer_id: this.customer_id,
+          customer_info: this.customer_id,
         },
       })
         .then((res) => {
           console.log(res);
-          this.loading = false;
+         this.loading = false; this.queryResData=[];
           if (res.data.length != 0) {
             console.log(res);
             this.queryResData = [];
@@ -345,7 +358,7 @@ export default {
       })
         .then((res) => {
           console.log("添加地址成功");
-                  this.$message.success("添加地址成功");
+          this.$message.success("添加地址成功");
         })
         .catch((err) => {});
     },
@@ -361,7 +374,6 @@ export default {
       })
         .then((res) => {
           this.refreshGetAllProduct();
-
         })
         .catch((err) => {});
     },
@@ -384,7 +396,7 @@ export default {
   },
   created() {
     this.customer_id = sessionStorage.getItem("userName");
-    this.level = sessionStorage.getItem("userLevel")
+    this.level = sessionStorage.getItem("userLevel");
   },
 };
 </script>

@@ -7,7 +7,12 @@
     <div class="content-container">
       <el-row>
         <el-col style="width:43%">
-          <el-form :model="formData" ref="formData" label-width="120px" label-position="left">
+          <el-form
+            :model="formData"
+            ref="formData"
+            label-width="120px"
+            label-position="left"
+          >
             <el-form-item label="客户信息" prop="customer_info">
               <el-autocomplete
                 style="width:100%"
@@ -33,7 +38,7 @@
       <el-row style="padding-top:10px">
         <el-col class="customer-table" :span="24">
           <el-table
-            height="400"
+            :height="tableHeight"
             v-loading="loading"
             element-loading-text="加载中..."
             element-loading-custom-class="loading_color"
@@ -46,14 +51,47 @@
             :data="computedQueryResData"
             ref="multipleTable"
           >
-            <el-table-column align="center" type="selection" width="100px"></el-table-column>
-            <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
-            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
-            <el-table-column align="center" label="入库时间" prop="come_time" width="100px"></el-table-column>
-            <el-table-column align="center" label="货品名称" prop="product_name"></el-table-column>
-            <el-table-column align="center" label="货品SKU" prop="product_sku"></el-table-column>
-            <el-table-column align="center" label="数量" prop="storage_count"></el-table-column>
-            <el-table-column align="center" label="仓储天数" prop="save_days"></el-table-column>
+            <el-table-column
+              align="center"
+              type="selection"
+              width="100px"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="客户编号"
+              prop="customer_id"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="公司名称"
+              prop="company_name"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="入库时间"
+              prop="come_time"
+              width="130px"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="货品名称"
+              prop="product_name"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="货品SKU"
+              prop="product_sku"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="数量"
+              prop="storage_count"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="仓储天数"
+              prop="save_days"
+            ></el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -75,22 +113,50 @@
       </el-row>
       <el-row type="flex" class="padding_tb padding_lr">
         <el-col :span="2">
-          <el-button type="danger" :disabled="isDel" @click="deleteSubmit">删除</el-button>
+          <el-button type="danger" :disabled="isDel" @click="deleteSubmit"
+            >删除</el-button
+          >
         </el-col>
       </el-row>
     </div>
 
-    <el-dialog title="-添加货品信息-" :visible.sync="addDV" width="35%" class="productPage-addForm" :before-close="handleClose">
-      <el-form :model="addForm" ref="addForm" :rules="addRules" label-width="120px">
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+    <el-dialog
+      :close-on-click-modal="false"
+      title="-添加货品信息-"
+      :visible.sync="addDV"
+      width="35%"
+      class="productPage-addForm"
+      :before-close="handleClose"
+    >
+      <el-form
+        :model="addForm"
+        ref="addForm"
+        :rules="addRules"
+        label-width="120px"
+      >
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
           <el-form-item prop="customer_id" label="客户编号:">
             <el-col :span="24" style="padding-left:20px">
-              <el-input v-model="addForm.customer_id"></el-input>
+              <el-autocomplete
+                style="width:100%"
+                v-model="addForm.customer_id"
+                :fetch-suggestions="dialogQuerySearch"
+                clearable
+                placeholder="模糊查询"
+              ></el-autocomplete>
             </el-col>
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
           <el-form-item prop="come_time" label="入库时间:">
             <el-col :span="24" style="padding-left:20px">
               <el-date-picker
@@ -104,22 +170,46 @@
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
           <el-form-item prop="product_name" label="货品名称:">
             <el-col :span="24" style="padding-left:20px">
-              <el-input v-model="addForm.product_name"></el-input>
+              <el-autocomplete
+                style="width:100%"
+                v-model="addForm.product_name"
+                :fetch-suggestions="dialogQuerySearch"
+                clearable
+                placeholder="模糊查询"
+              ></el-autocomplete>
             </el-col>
           </el-form-item>
         </el-row>
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
           <el-form-item prop="product_sku" label="货品SKU:">
             <el-col :span="24" style="padding-left:20px">
-              <el-input v-model="addForm.product_sku"></el-input>
+              <el-autocomplete
+                style="width:100%"
+                v-model="addForm.product_sku"
+                :fetch-suggestions="dialogQuerySearch"
+                clearable
+                placeholder="模糊查询"
+              ></el-autocomplete>
             </el-col>
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
           <el-form-item prop="storage_count" label="初始数量:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.storage_count"></el-input>
@@ -127,7 +217,11 @@
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
           <el-form-item prop="save_days" label="仓储天数:">
             <el-col :span="24" style="padding-left:20px">
               <el-input disabled v-model="addForm.save_days"></el-input>
@@ -144,10 +238,12 @@
 </template>
 
 <script>
-import { utcToCst } from "../../utils/utcToCst";
+import { utcToCst } from "@/utils/utcToCst";
+import { getNowFormatDate } from "@/utils/getCurrentTime";
 export default {
   data() {
     return {
+      tableHeight: window.innerHeight * 0.65,
       times: 0, // 监听计数
       timer: null,
       loading: false, // 加载标识，默认为false,当调用接口时赋值为true
@@ -162,9 +258,9 @@ export default {
       addDV: false, // 对话框默认不显示
       productReqUrl: "", // 货品信息请求地址
       productReqData: {}, // 货品信息提交数据
-      locateReqUrl: "/api/query/getLocateCustomerId", // 模糊查询地址
-      locateReqData: {}, // 模糊查询客户信息
       nameTipsArray: [], // 提醒下拉框
+      customer_id_list: [], // 添加 模糊查询列表
+      addNameTipsArray: [], // 添加 提醒下拉框
       formData: {
         // 查询列表
         customer_info: "", // 客户信息,
@@ -194,7 +290,7 @@ export default {
         out_count: "0",
         status: "待出库",
         product_code: "",
-         record_code: "",
+        record_code: "",
       },
       louqueForm: {
         customer_id: "客户编号",
@@ -205,20 +301,67 @@ export default {
         save_days: "仓储天数",
         out_count: "出库数量",
         status: "状态",
-         record_code: "出库码",
-        
+        record_code: "出库码",
       },
       rules: {
-        customer_info: [{ message: "请输入客户信息", required: true, trigger: ["blur", "change"] }],
+        customer_info: [
+          {
+            message: "请输入客户信息",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       addRules: {
-        customer_id: [{ message: "请输入客户编号", required: true, trigger: ["blur", "change"] }],
-        come_time: [{ message: "请输入入库时间", required: true, trigger: ["blur", "change"] }],
-        product_name: [{ message: "请输入货品名称", required: true, trigger: ["blur", "change"] }],
-        product_sku: [{ message: "请输入货品SKU", required: true, trigger: ["blur", "change"] }],
-        storage_count: [{ message: "请输入初始数量", required: true, trigger: ["blur", "change"] }],
-        out_count: [{ message: "请输入出库数量", required: true, trigger: ["blur", "change"] }],
-        status: [{ message: "请选择货品状态", required: true, trigger: ["blur", "change"] }],
+        customer_id: [
+          {
+            message: "请输入客户编号",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        come_time: [
+          {
+            message: "请输入入库时间",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        product_name: [
+          {
+            message: "请输入货品名称",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        product_sku: [
+          {
+            message: "请输入货品SKU",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        storage_count: [
+          {
+            message: "请输入初始数量",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        out_count: [
+          {
+            message: "请输入出库数量",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        status: [
+          {
+            message: "请选择货品状态",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       queryPage: {
         // 分页器
@@ -266,28 +409,19 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-        this.productReqUrl = "/api/query/getProductByCustomerId";
-        this.productReqData = { customer_id: this.formData.customer_info };
-      } else if (this.formData.customer_info == "") {
-        this.productReqUrl = "/api/query/getAllProduct";
-        this.productReqData = {};
-      } else {
-        this.productReqUrl = "/api/query/getProductByCompanyName";
-        this.productReqData = { company_name: this.formData.customer_info };
-      }
       this.loading = true;
-
-      console.log(this.productReqUrl);
-      console.log(this.productReqData);
 
       this.$http({
         method: "post",
-        url: this.productReqUrl,
-        data: this.productReqData,
+        url: "api/query/getProductLocateByTime",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
+          this.queryResData = [];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -312,27 +446,18 @@ export default {
 
     // 查询
     refreshFormSearch() {
-      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-        this.productReqUrl = "/api/query/getProductByCustomerId";
-        this.productReqData = { customer_id: this.formData.customer_info };
-      } else if (this.formData.customer_info == "") {
-        this.productReqUrl = "/api/query/getAllProduct";
-        this.productReqData = {};
-      } else {
-        this.productReqUrl = "/api/query/getProductByCompanyName";
-        this.productReqData = { company_name: this.formData.customer_info };
-      }
-
-      console.log(this.productReqUrl);
-      console.log(this.productReqData);
       this.loading = true;
       this.$http({
         method: "post",
-        url: this.productReqUrl,
-        data: this.productReqData,
+        url: "api/query/getProductLocateByTime",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
+          this.queryResData = [];
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
@@ -351,6 +476,87 @@ export default {
           this.$message.error(err);
         });
     },
+    // 添加 搜索框模糊查询
+    dialogQuerySearch(queruString, cb) {
+      if (this.addForm.customer_id != "") {
+        var addNameTipsArray = this.addNameTipsArray;
+        cb(addNameTipsArray);
+      } else {
+        cb([{ value: "" }]);
+      }
+    },
+
+    // 监听添加输入框，有变动就触发防抖函数
+    getDialogData() {
+      let payload;
+      if (
+        this.addDV == true &&
+        this.addForm.product_name == "" &&
+        this.addForm.product_sku == ""
+      ) {
+        payload = this.addForm.customer_id;
+      } else if (
+        this.addDV == true &&
+        this.addForm.customer_id != "" &&
+        this.addForm.product_sku == ""
+      ) {
+        payload = this.addForm.product_name;
+      } else if (
+        this.addDV == true &&
+        this.addForm.customer_id != "" &&
+        this.addForm.product_name != ""
+      ) {
+        payload = this.addForm.product_sku;
+      }
+      console.log(payload);
+      this.$http({
+        method: "post",
+        url: "api/query/getProductDialogLocate",
+        data: {
+          customer_info: payload,
+        },
+      })
+        .then((res) => {
+          console.log(res);
+          this.customer_id_list = [];
+          this.customer_id_list = res.data;
+          if (this.addForm.customer_id != "") {
+            this.addNameTipsArray = [];
+            let avoidSameArr = [];
+            // 遍历模糊查询返回的列表,获取包含输入框关键字的字段,添加到历史列表中
+            // 并且,当历史列表已存在相同字段,则跳过此遍历阶段
+            for (let item of this.customer_id_list) {
+              let flag = 0; // 用于标记是否需要跳过
+              // 遍历每个item对象
+              for (let prop in item) {
+                if (
+                  String(item[prop]).indexOf(payload) != -1
+                ) {
+                  // 对防重数组遍历,若存在与历史列表对象中完全匹配的属性,则跳过此遍历
+                  for (let val of avoidSameArr) {
+                    if (val == item[prop]) {
+                      flag = 1;
+                      break;
+                    }
+                  }
+                  if (flag == 0) {
+                    this.addNameTipsArray.push({
+                      value: String(item[prop]),
+                    });
+                    avoidSameArr.push(String(item[prop]));
+                  } else {
+                    continue;
+                  }
+                }
+              }
+            }
+          }
+        })
+        .catch((err) => {
+          this.$message.error(err);
+        });
+    },
+
     // 搜索框模糊查询
     querySearch(queruString, cb) {
       if (this.formData.customer_info != "") {
@@ -364,17 +570,44 @@ export default {
     getData() {
       this.$http({
         method: "post",
-        url: this.locateReqUrl,
-        data: this.locateReqData,
+        url: "api/query/getProductLocate",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
+          console.log(res);
           this.customer_info_list = res.data;
           if (this.formData.customer_info != "") {
             this.nameTipsArray = [];
+            let avoidSameArr = [];
+            // 遍历模糊查询返回的列表,获取包含输入框关键字的字段,添加到历史列表中
+            // 并且,当历史列表已存在相同字段,则跳过此遍历阶段
             for (let item of this.customer_info_list) {
-              let obj = { value: "" };
-              obj.value = String(Object.values(item)[0]);
-              this.nameTipsArray.push(obj);
+              let flag = 0; // 用于标记是否需要跳过
+              // 遍历每个item对象
+              for (let prop in item) {
+                console.log(item[prop]);
+                if (
+                  String(item[prop]).indexOf(this.formData.customer_info) != -1
+                ) {
+                  // 对防重数组遍历,若存在与历史列表对象中完全匹配的属性,则跳过此遍历
+                  for (let val of avoidSameArr) {
+                    if (val == item[prop]) {
+                      flag = 1;
+                      break;
+                    }
+                  }
+                  if (flag == 0) {
+                    this.nameTipsArray.push({
+                      value: String(item[prop]),
+                    });
+                    avoidSameArr.push(String(item[prop]));
+                  } else {
+                    continue;
+                  }
+                }
+              }
             }
           }
         })
@@ -438,7 +671,11 @@ export default {
       console.log(this.addForm);
       // 对货品添加列表进行校验，如果有漏填项则提示
       for (let key in this.addForm) {
-        if (key == "product_code" || key == "out_time" || key == "record_code") {
+        if (
+          key == "product_code" ||
+          key == "out_time" ||
+          key == "record_code"
+        ) {
           continue;
         }
         if (this.addForm[key] == "") {
@@ -488,7 +725,10 @@ export default {
           } else {
             this.updateForm = this.addForm;
             this.updateForm.product_code = res.data[0].product_code;
-            this.updateForm.storage_count = String(Number(res.data[0].storage_count) + Number(this.addForm.storage_count));
+            this.updateForm.storage_count = String(
+              Number(res.data[0].storage_count) +
+                Number(this.addForm.storage_count)
+            );
             this.updateForm.out_count = String(Number(res.data[0].out_count));
             console.log(this.updateForm);
 
@@ -524,7 +764,9 @@ export default {
       })
         .then((res) => {
           if (res.data.length == 0) {
-            this.$message.warning(`不存在编号为${this.addForm.customer_id}的客户，请重新输入！`);
+            this.$message.warning(
+              `不存在编号为${this.addForm.customer_id}的客户，请重新输入！`
+            );
           } else {
             this.addSubmit();
           }
@@ -535,14 +777,6 @@ export default {
   watch: {
     formData: {
       handler: function(nV, oV) {
-        // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-          this.locateReqUrl = "/api/query/getLocateCustomerId";
-          this.locateReqData = { customer_id: nV.customer_info };
-        } else {
-          this.locateReqUrl = "api/query/getLocateCompanyName";
-          this.locateReqData = { company_name: nV.customer_info };
-        }
         this.debounce(this.getData, 1000);
       },
       deep: true,
@@ -556,6 +790,7 @@ export default {
           var day = parseInt((a2 - a1) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
           nV.save_days = day + 1;
         }
+        this.debounce(this.getDialogData, 1000);
       },
       deep: true,
     },
@@ -570,18 +805,23 @@ export default {
   mounted() {
     var today = new Date();
     today.setTime(today.getTime());
-    var today_date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+    var today_date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
     this.today_date = today_date;
 
     this.refreshFormSearch();
   },
-    created() {
-      if (sessionStorage.getItem("userLevel") == "管理员") {   
+  created() {
+    if (sessionStorage.getItem("userLevel") == "管理员") {
     } else {
-     this.$message.warning("你没有权限使用此功能!");
+      this.$message.warning("你没有权限使用此功能!");
       this.$router.push("/");
     }
-  }
+  },
 };
 </script>
 

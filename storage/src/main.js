@@ -8,7 +8,6 @@ import 'element-ui/lib/theme-chalk/index.css' //element-ui样式引入
 import element from './element-ui/index' //element-ui文件夹下
 // import element from "element-ui"
 Vue.use(element)
-
 Vue.prototype.$http = axios;
 
 Vue.config.productionTip = false

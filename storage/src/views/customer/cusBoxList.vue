@@ -6,10 +6,10 @@
 
     <div class="content-container">
       <el-row>
-        <el-col :span="6">
+        <el-col style="width:auto">
           <p class="customer_id_style">客户编号:{{ customer_id }}</p>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="3" style="margin-left:2%">
           <el-button :class="[isNoClick == true ? 'disabled-btn' : 'add-btn']" :disabled="isNoClick" @click="addOpen"
             >点击填写地址(勾选后点击,若多选则提交同一地址)</el-button
           >
@@ -18,7 +18,7 @@
       <el-row>
         <el-col class="customer-table" :span="24">
           <el-table
-            height="550"
+            :height="tableHeight"
             v-loading="loading"
             element-loading-text="加载中..."
             element-loading-custom-class="loading_color"
@@ -68,7 +68,14 @@
       </el-row>
     </div>
 
-    <el-dialog title="-填写地址信息-" class="cus-dialog-style" :visible.sync="addDV" width="55%" :before-close="handleClose">
+    <el-dialog
+      :close-on-click-modal="false"
+      title="-填写地址信息-"
+      class="cus-dialog-style"
+      :visible.sync="addDV"
+      width="55%"
+      :before-close="handleClose"
+    >
       <el-form v-model="addForm" ref="addForm" label-width="340px">
         <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
           <el-form-item required label="买家地址 Enter customer address:">
@@ -143,11 +150,12 @@
 </template>
 
 <script>
-import { utcToCst } from "../../utils/utcToCst";
-import { getNowFormatDate } from "../../utils/getCurrentTime";
+import { utcToCst } from "@/utils/utcToCst";
+import { getNowFormatDate } from "@/utils/getCurrentTime";
 export default {
   data() {
     return {
+      tableHeight: window.innerHeight * 0.65,
       level: "", // 用户身份
       customer_id: "", // 客户编号
       isNoClick: true, // 禁止添加
@@ -235,8 +243,8 @@ export default {
       this.loading = true;
       this.$http({
         method: "post",
-        url: "/api/query/getBoxByCustomerId",
-        data: { customer_id: this.customer_id },
+        url: "/api/query/getBoxLocateByTime",
+        data: { customer_info: this.customer_id },
       })
         .then((res) => {
           console.log(res);
@@ -337,7 +345,7 @@ export default {
       })
         .then((res) => {
           console.log("添加地址成功");
-        this.$message.success("添加地址成功!")
+          this.$message.success("添加地址成功!");
         })
         .catch((err) => {});
     },

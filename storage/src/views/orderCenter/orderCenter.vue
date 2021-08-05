@@ -30,7 +30,7 @@
       <el-row style="padding-top:5px">
         <el-col class="customer-table" :span="24">
           <el-table
-            height="405"
+            :height="tableHeight"
             v-loading="loading"
             element-loading-text="加载中..."
             element-loading-custom-class="loading_color"
@@ -44,12 +44,14 @@
             ref="multipleTable"
           >
             <el-table-column align="center" type="selection" width="100px"></el-table-column>
-            <el-table-column align="center" label="客户名称" prop="customer_id"></el-table-column>
+            <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
+            <el-table-column align="center" label="公司" prop="company_name"></el-table-column>
             <el-table-column align="center" label="产品" prop="product_name" width="270px"></el-table-column>
+            <el-table-column align="center" label="sku" prop="product_sku" ></el-table-column>
             <el-table-column align="center" label="下单数量" prop="out_count"></el-table-column>
             <el-table-column align="center" label="地址">
               <template slot-scope="scope">
-                <el-link type="primary" style="font-size:16px" @mouseover.native="showAddress(scope)">查看详情</el-link>
+                <el-link type="primary" style="font-size:16px" @click="showAddress(scope)">查看详情</el-link>
               </template>
             </el-table-column>
           </el-table>
@@ -78,7 +80,14 @@
       </el-row>
     </div>
 
-    <el-dialog title="-添加客户信息-" class="cus-dialog-style" :visible.sync="addDV" width="55%" :before-close="handleClose">
+    <el-dialog
+      :close-on-click-modal="false"
+      title="-送货地址详情-"
+      class="cus-dialog-style"
+      :visible.sync="addDV"
+      width="55%"
+      :before-close="handleClose"
+    >
       <el-form v-model="addressForm" ref="addressForm" label-width="340px">
         <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
           <el-form-item required label="买家地址 Enter customer address:">
@@ -152,10 +161,12 @@
 </template>
 
 <script>
-import { utcToCst } from "../../utils/utcToCst";
+import { utcToCst } from "@/utils/utcToCst";
+import { getNowFormatDate } from "@/utils/getCurrentTime";
 export default {
   data() {
     return {
+      tableHeight: window.innerHeight * 0.65,
       times: 0, // 监听计数
       timer: null,
       loading: false, // 加载标识，默认为false,当调用接口时赋值为true
@@ -234,17 +245,7 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-        this.outRecordReqUrl = "/api/query/getOutRecordByCustomerId";
-        this.outRecordReqData = { customer_id: this.formData.customer_info };
-        this.getOutRecord();
-      } else if (this.formData.customer_info == "") {
-        this.getAllOutRecord();
-      } else {
-        this.outRecordReqUrl = "/api/query/getOutRecordByCompanyName";
-        this.outRecordReqData = { company_name: this.formData.customer_info };
-        this.getOutRecord();
-      }
+      this.getOutRecord();
     },
     // 搜索框模糊查询
     querySearch(queruString, cb) {
@@ -260,11 +261,13 @@ export default {
       this.loading = true;
       this.$http({
         method: "post",
-        url: this.outRecordReqUrl,
-        data: this.outRecordReqData,
+        url: "api/query/getOutRecordLocateByTime",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
-          this.loading = false;
+          this.loading = false; this.queryResData=[];
           if (res.data.length != 0) {
             this.queryResData = [];
             this.$message.success("查询成功");
@@ -296,7 +299,7 @@ export default {
         url: "/api/query/getAllOutRecord",
       })
         .then((res) => {
-          this.loading = false;
+          this.loading = false; this.queryResData=[];
           this.queryResData = [];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
@@ -326,7 +329,7 @@ export default {
         url: "/api/query/getAllOutRecord",
       })
         .then((res) => {
-          this.loading = false;
+          this.loading = false; this.queryResData=[];
           console.log(res);
           this.queryResData = [];
           for (let item of res.data) {
@@ -422,7 +425,7 @@ export default {
     showAddress(scope) {
       console.log(scope);
 
-      this.debounce(this.getAddress(scope),1000)
+      this.debounce(this.getAddress(scope), 1000);
     },
 
     //获取地址
@@ -437,17 +440,15 @@ export default {
         .then((res) => {
           console.log(res);
           this.addressForm = res.data[0];
-          
-          setTimeout( ()=>{
-               this.addDV = true;
-          },200)
-       
+
+          setTimeout(() => {
+            this.addDV = true;
+          }, 200);
         })
         .catch((err) => {
           console.log(err);
         });
     },
-
 
     handleClose() {
       this.addressForm = {};
@@ -457,17 +458,43 @@ export default {
     getData() {
       this.$http({
         method: "post",
-        url: this.locateReqUrl,
-        data: this.locateReqData,
+        url: "api/query/getOutRecordLocate",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
           this.customer_info_list = res.data;
           if (this.formData.customer_info != "") {
             this.nameTipsArray = [];
+            let avoidSameArr = [];
+            // 遍历模糊查询返回的列表,获取包含输入框关键字的字段,添加到历史列表中
+            // 并且,当历史列表已存在相同字段,则跳过此遍历阶段
             for (let item of this.customer_info_list) {
-              let obj = { value: "" };
-              obj.value = String(Object.values(item)[0]);
-              this.nameTipsArray.push(obj);
+              let flag = 0; // 用于标记是否需要跳过
+              if (item.out_source == "管理员") {
+                continue;
+              }
+              // 遍历每个item对象
+              for (let prop in item) {
+                if (String(item[prop]).indexOf(this.formData.customer_info) != -1) {
+                  // 对防重数组遍历,若存在与历史列表对象中完全匹配的属性,则跳过此遍历
+                  for (let val of avoidSameArr) {
+                    if (val == item[prop]) {
+                      flag = 1;
+                      break;
+                    }
+                  }
+                  if (flag == 0) {
+                    this.nameTipsArray.push({
+                      value: String(item[prop]),
+                    });
+                    avoidSameArr.push(String(item[prop]));
+                  } else {
+                    continue;
+                  }
+                }
+              }
             }
           }
         })

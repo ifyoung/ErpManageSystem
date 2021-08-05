@@ -15,6 +15,35 @@ var jsonWrite = function(res, ret) {
   }
 };
 
+// 更新指定客户信息
+router.post("/updateSpecificCustomer", (req, res) => {
+  var sql = $sql.update.updateSpecificCustomer;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(
+    sql,
+    [
+      parms.customer_id,
+      parms.company_name,
+      parms.first_come_time,
+      parms.leave_amount,
+      parms.auto_pwd,
+      parms.customer_id,
+  
+    ],
+    function(err, result) {
+      if (err) {
+        console.log(err);
+        // console.log(store.state.sql.sqlState)
+        console.log("报错了天哪");
+      }
+      if (result) {
+        jsonWrite(res, result);
+      }
+    }
+  );
+});
+
 // 更新货品信息
 router.post("/updateProduct", (req, res) => {
   var sql = $sql.update.updateProduct;
@@ -49,6 +78,7 @@ router.post("/updateProduct", (req, res) => {
     }
   );
 });
+
 // 更新箱子信息
 router.post("/updateBox", (req, res) => {
   var sql = $sql.update.updateBox;

@@ -15,7 +15,11 @@ import BoxOut from "../views/boxManage/boxOut";
 import BoxOutList from "../views/boxManage/boxOutList";
 
 import CusProductList from "../views/customer/cusProductList";
-import CusBoxList from "../views/customer/cusBoxList";
+import OnlyReadProductCome from '../views/customer/onlyRead/onlyReadProductCome'
+import OnlyReadProductList from '../views/customer/onlyRead/onlyReadProductList'
+import OnlyReadBoxCome from '../views/customer/onlyRead/onlyReadBoxCome'
+import OnlyReadBoxList from '../views/customer/onlyRead/onlyReadBoxList'
+import OnlyReadOutRecord from '../views/customer/onlyRead/onlyReadOutRecord'
 
 import PossessSystem from "../views/possessSystem/possessSystem";
 
@@ -108,9 +112,30 @@ const routes = [
         path: "/cusProductList",
         component: CusProductList,
       },
+
       {
-        path: "/cusBoxList",
-        component: CusBoxList,
+        path: "/onlyReadProductCome",
+        component: OnlyReadProductCome,
+      },
+
+      {
+        path: "/onlyReadProductList",
+        component: OnlyReadProductList,
+      },
+
+      {
+        path: "/onlyReadBoxCome",
+        component: OnlyReadBoxCome,
+      },
+
+      {
+        path: "/onlyReadBoxList",
+        component: OnlyReadBoxList,
+      },
+
+      {
+        path: "/onlyReadOutRecord",
+        component: OnlyReadOutRecord,
       },
     ],
   },

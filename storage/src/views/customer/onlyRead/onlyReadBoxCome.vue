@@ -1,37 +1,9 @@
 <template>
   <div class="header-container">
     <div class="module-title">
-      <h1>箱子出库</h1>
+      <h1>箱子入库</h1>
     </div>
-
     <div class="content-container">
-      <el-row>
-        <el-col :span="10">
-          <el-form
-            :model="formData"
-            ref="formData"
-            label-width="100px"
-            label-position="left"
-          >
-            <el-form-item label="客户信息:" prop="customer_info">
-              <el-autocomplete
-                style="width:100%"
-                v-model="formData.customer_info"
-                :fetch-suggestions="querySearch"
-                clearable
-                id="formSearch"
-                placeholder="请输入客户编号或公司名称，为空时查询所有"
-              ></el-autocomplete>
-            </el-form-item>
-          </el-form>
-        </el-col>
-        <el-col style="margin-left:10px;" :span="2">
-          <el-button type="primary" @click="formSearch">查询</el-button>
-        </el-col>
-        <el-col :span="2">
-          <el-button type="info" @click="resetForm('formData')">重置</el-button>
-        </el-col>
-      </el-row>
       <el-row>
         <el-col class="customer-table" :span="24">
           <el-table
@@ -48,18 +20,17 @@
             :data="computedQueryResData"
             ref="multipleTable"
           >
-            <!-- <el-table-column align="center" type="selection" width="100px"></el-table-column> -->
-            <el-table-column
-              align="center"
-              label="客户编号"
-              prop="customer_id"
-              width="150px"
-            ></el-table-column>
             <el-table-column
               align="center"
               label="公司名称"
               prop="company_name"
               width="150px"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="入库时间"
+              prop="come_time"
+              width="200px"
             ></el-table-column>
             <el-table-column
               align="center"
@@ -75,50 +46,26 @@
             ></el-table-column>
             <el-table-column
               align="center"
-              label="重量(lb)"
+              label="抛重重量(lb)"
               prop="weight"
-              width="130"
+              width="150px"
             ></el-table-column>
             <el-table-column
               align="center"
-              label="入库时间"
-              prop="come_time"
-             width="130"
+              label="实际重量(lb)"
+              prop="real_weight"
+              width="150px"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="数量"
+              prop="save_days"
             ></el-table-column>
             <el-table-column
               align="center"
               label="仓储天数"
               prop="save_days"
-              width="130"
             ></el-table-column>
-            <el-table-column
-              align="center"
-              label="仓储数量"
-              prop="count"
-              width="130"
-            ></el-table-column>
-            <el-table-column
-              align="center"
-              label="出库数量"
-              prop="out_count"
-              width="130"
-            ></el-table-column>
-            <el-table-column align="center" label="出库操作" width="200px">
-              <template slot-scope="scope">
-                <div class="sa-container">
-                  <el-input
-                    placeholder="请输入"
-                    v-model="scope.row.operateCount"
-                  ></el-input>
-                </div>
-                <el-button
-                  style="margin-left:5px"
-                  class="modify-btn small-btn"
-                  @click="outSubmit(scope.row)"
-                  >数据提交</el-button
-                >
-              </template>
-            </el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -139,22 +86,144 @@
         </el-col>
       </el-row>
     </div>
+
+    <el-dialog
+      :close-on-click-modal="false"
+      title="-添加箱子信息-"
+      :visible.sync="addDV"
+      width="35%"
+      class="productPage-addForm"
+      :before-close="handleClose"
+    >
+      <el-form
+        :model="addForm"
+        ref="addForm"
+        :rules="addRules"
+        label-width="140px"
+      >
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
+          <el-form-item prop="customer_id" label="客户编号:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addForm.customer_id"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
+          <el-form-item prop="come_time" label="入库时间:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-date-picker
+                :picker-options="pickerOption"
+                type="date"
+                placeholder="选择日期"
+                value-format="yyyy-MM-dd"
+                v-model="addForm.come_time"
+              ></el-date-picker>
+            </el-col>
+          </el-form-item>
+        </el-row>
+
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
+          <el-form-item prop="product_name" label="箱子名称:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addForm.product_name"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
+          <el-form-item prop="length_width_height" label="规格(cm):">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addForm.length_width_height"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
+          <el-form-item prop="weight" label="抛重重量(lb):">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input disabled v-model="addForm.weight"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
+          <el-form-item prop="real_weight" label="实际重量(lb):">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addForm.real_weight"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
+          <el-form-item prop="count" label="仓储数量:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input v-model="addForm.count"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
+          <el-form-item prop="save_days" label="仓储天数:">
+            <el-col :span="24" style="padding-left:20px">
+              <el-input disabled v-model="addForm.save_days"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="checkCustomerId()">提 交</el-button>
+        <el-button type="primary" plain @click="addDV = false">取 消</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { utcToCst } from "../../utils/utcToCst";
-import { getNowFormatDate } from "../../utils/getCurrentTime";
+import { utcToCst } from "@/utils/utcToCst";
+import { getNowFormatDate } from "@/utils/getCurrentTime";
 export default {
   data() {
     return {
       tableHeight: window.innerHeight * 0.65,
-      user: "", // 客户编号
-      level: "", // 权限身份
       times: 0, // 监听计数
       timer: null,
       loading: false, // 加载标识，默认为false,当调用接口时赋值为true
       today_date: "", // 今天的日期
+      isDel: true, // 删除禁用
+      multipleSelection: [], // 勾选列表
+      solidSelection: [], // 防渲染后勾选消失的列表
       pickerOption: {
         disabledDate: (time) => {
           return time.getTime() > Date.now(); /*今天及之前，注意数字不一样*/
@@ -177,7 +246,7 @@ export default {
         come_time: "入库时间",
         product_name: "箱子名称",
         length_width_height: "规格(cm)",
-        weight: "重量(lb)",
+        weight: "抛重重量(lb)",
         count: "初始数量",
         save_days: "仓储天数",
         out_count: "出库数量",
@@ -190,11 +259,14 @@ export default {
         product_name: "",
         length_width_height: "",
         weight: "",
+        real_weight: "",
         count: "",
         save_days: "",
-        out_count: "",
+        out_count: "0",
         box_code: "",
-        status: "",
+        status: "待出库",
+        out_time: "1970-01-01",
+        record_code: "",
       },
       rules: {
         customer_info: [
@@ -234,9 +306,9 @@ export default {
             trigger: ["blur", "change"],
           },
         ],
-        weight: [
+        real_weight: [
           {
-            message: "请输入重量(lb)",
+            message: "请输入实际重量(lb)",
             required: true,
             trigger: ["blur", "change"],
           },
@@ -299,7 +371,14 @@ export default {
       return styleJson; // 返回对象
     },
     // 监听勾选
-    handleSelectionChange(val) {},
+    handleSelectionChange(val) {
+      if (val.length == 0) {
+        this.isDel = true;
+      } else {
+        this.isDel = false;
+      }
+      this.multipleSelection = val;
+    },
     // 重置
     resetForm(formName) {
       let form = this.$refs[formName];
@@ -310,9 +389,13 @@ export default {
       this.getBox();
     },
 
+    // 查询
+    refreshFormSearch() {
+      this.refreshGetBox();
+    },
+
     // 获取箱子信息
     getBox() {
-      this.loading = true;
       this.$http({
         method: "post",
         url: "api/query/getBoxLocateByTime",
@@ -321,7 +404,6 @@ export default {
         },
       })
         .then((res) => {
-         this.loading = false; this.queryResData=[];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -333,8 +415,8 @@ export default {
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
-              item.operateCount = "";
             }
+            console.log(res.data);
             this.queryResData = res.data;
           } else {
             this.$message.warning("未查询到相关数据");
@@ -344,7 +426,6 @@ export default {
           this.$message.error(err);
         });
     },
-
     // 刷新箱子信息列表
     refreshGetBox() {
       this.loading = true;
@@ -352,11 +433,11 @@ export default {
         method: "post",
         url: "api/query/getBoxLocateByTime",
         data: {
-          customer_info: this.formData.customer_info,
+          customer_info:  sessionStorage.getItem("userName"),
         },
       })
         .then((res) => {
-         this.loading = false; this.queryResData=[];
+          this.loading = false;
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
@@ -367,7 +448,6 @@ export default {
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
-              item.operateCount = "";
             }
             this.queryResData = res.data;
           }
@@ -376,6 +456,39 @@ export default {
           this.$message.error(err);
         });
     },
+    // 删除提交
+    deleteSubmit() {
+      this.$confirm("确定删除客户信息?")
+        .then(() => {
+          this.solidSelection = this.multipleSelection;
+          while (this.solidSelection.length != 0) {
+            this.deleteBox();
+            this.solidSelection.shift();
+          }
+          this.$message.success("删除客户信息成功!");
+        })
+        .catch((err) => {
+          this.$message.warning("取消删除");
+        });
+    },
+    // 删除货物信息
+    deleteBox() {
+      this.$http({
+        method: "post",
+        url: "api/delete/deleteBox",
+        data: {
+          customer_id: this.solidSelection[0].customer_id,
+          box_code: this.solidSelection[0].box_code,
+        },
+      })
+        .then((res) => {
+          this.refreshFormSearch();
+        })
+        .catch((err) => {
+          this.$message.error(err);
+        });
+    },
+
     // 搜索框模糊查询
     querySearch(queruString, cb) {
       if (this.formData.customer_info != "") {
@@ -439,109 +552,6 @@ export default {
         fn();
       }, wait);
     },
-    // 添加货物信息(打开添加框)
-    addOpen() {
-      if (this.formData.customer_info != "") {
-        this.addForm.customer_id = this.formData.customer_info;
-      }
-      this.addDV = true;
-    },
-    // 出库减法操作
-    outSubtract(row) {
-      if (row.operateCount == 0) {
-        this.$message.warning("撤回的数量已为0，无法再进行删减");
-        return;
-      }
-      row.count++;
-      row.out_count--;
-      row.operateCount--;
-    },
-    // 出库加法操作
-    outAdd(row) {
-      if (row.count == 0) {
-        this.$message.warning("货物的仓储件数已为0，无法出库更多!");
-        return;
-      }
-      row.count--;
-      row.out_count++;
-      row.operateCount++;
-    },
-    // 出库提交修改
-    outSubmit(row) {
-      if (row.operateCount == "") {
-        this.$message.warning("输入不能为空!");
-        return;
-      }
-
-      if (
-        Number(row.out_count) + Number(row.operateCount) >
-        Number(row.count)
-      ) {
-        this.$message.warning("出货的数量已超过初始仓储数量");
-        return;
-      } else if (Number(row.count) < 0) {
-        this.$message.warning("出货的数量不能为负数");
-        return;
-      }
-      this.$confirm("确认提交吗?")
-        .then(() => {
-          row.out_count = String(
-            Number(row.out_count) + Number(row.operateCount)
-          );
-          let data = {};
-          let record_code = String(Math.floor(Math.random() * 1000 + 8999));
-          for (let name in row) {
-            if (name == "operateCount") {
-              continue;
-            }
-            data[name] = row[name];
-          }
-          data.out_time = getNowFormatDate();
-
-          this.updateBox(data, record_code);
-          this.insertOutRecord(data, row, record_code);
-        })
-        .catch((err) => {
-          console.log(err);
-          this.$message.info("取消提交");
-        });
-    },
-
-    // 更新箱子信息
-    updateBox(data) {
-      this.$http({
-        method: "post",
-        url: "api/update/updateBox",
-        data: data,
-      })
-        .then((res) => {
-          this.refreshGetBox();
-          this.$message.success("提交成功");
-        })
-        .catch((err) => {});
-    },
-
-    // 添加 出库记录 信息
-    insertOutRecord(data, row, random) {
-      this.$http({
-        method: "post",
-        url: "api/insert/insertOutRecord",
-        data: {
-          customer_id: data.customer_id,
-          product_name: data.product_name,
-          product_sku: "---",
-          out_time: data.out_time,
-          out_count: row.operateCount,
-          record_code: random,
-          status: "false",
-          out_source: this.level,
-        },
-      })
-        .then((res) => {
-          console.log("添加箱子出库记录信息成功");
-        })
-        .catch((err) => {});
-    },
   },
   watch: {
     formData: {
@@ -552,8 +562,6 @@ export default {
     },
     addForm: {
       handler: function(nV, oV) {
-        // nV.save_days = nV.come_time;
-
         // 获取库存天数
         if (this.addForm.come_time != "") {
           var a1 = Date.parse(new Date(nV.come_time));
@@ -562,7 +570,7 @@ export default {
           nV.save_days = day + 1;
         }
 
-        // 根据规格获取重量
+        // 根据规格获取抛重重量
         if (this.addForm.length_width_height.length > 4) {
           let lwhArr = this.addForm.length_width_height.split("*");
           if (lwhArr.length == 3) {
@@ -597,14 +605,7 @@ export default {
     this.refreshGetBox();
   },
   created() {
-    this.user = sessionStorage.getItem("userName");
-    this.level = sessionStorage.getItem("userLevel");
     let that = this;
-    if (sessionStorage.getItem("userLevel") == "管理员") {
-    } else {
-      this.$message.warning("你没有权限使用此功能!");
-      this.$router.push("/");
-    }
   },
 };
 </script>
@@ -615,10 +616,5 @@ export default {
   /deep/ .el-form-item__error {
     padding-left: 20px;
   }
-}
-.sa-container {
-  display: inline-block;
-  margin-left: -15px;
-  max-width: 80px;
 }
 </style>

@@ -5,33 +5,6 @@
     </div>
 
     <div class="content-container">
-      <el-row>
-        <el-col :span="10">
-          <el-form
-            :model="formData"
-            ref="formData"
-            label-width="100px"
-            label-position="left"
-          >
-            <el-form-item label="客户信息:" prop="customer_info">
-              <el-autocomplete
-                style="width:100%"
-                v-model="formData.customer_info"
-                :fetch-suggestions="querySearch"
-                clearable
-                id="formSearch"
-                placeholder="请输入客户编号或公司名称，为空时查询所有"
-              ></el-autocomplete>
-            </el-form-item>
-          </el-form>
-        </el-col>
-        <el-col style="margin-left:10px;" :span="2">
-          <el-button type="primary" @click="formSearch">查询</el-button>
-        </el-col>
-        <el-col :span="2">
-          <el-button type="info" @click="resetForm('formData')">重置</el-button>
-        </el-col>
-      </el-row>
       <el-row style="padding-top:5px">
         <el-col class="customer-table" :span="24">
           <el-table
@@ -48,16 +21,6 @@
             :data="computedQueryResData"
             ref="multipleTable"
           >
-            <el-table-column
-              align="center"
-              type="selection"
-              width="100px"
-            ></el-table-column>
-            <el-table-column
-              align="center"
-              label="客户编号"
-              prop="customer_id"
-            ></el-table-column>
             <el-table-column
               align="center"
               label="公司名称"
@@ -84,11 +47,6 @@
               label="出库数量"
               prop="out_count"
             ></el-table-column>
-            <el-table-column
-              align="center"
-              label="操作者"
-              prop="out_source"
-            ></el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -108,16 +66,9 @@
           </el-pagination>
         </el-col>
       </el-row>
-      <el-row type="flex" class="padding_tb padding_lr">
-        <el-col :span="2">
-          <el-button type="danger" :disabled="isDel" @click="deleteSubmit"
-            >删除</el-button
-          >
-        </el-col>
-      </el-row>
     </div>
-  </div> </template
->A
+  </div>
+</template>
 
 <script>
 import { utcToCst } from "@/utils/utcToCst";
@@ -209,7 +160,6 @@ export default {
       })
         .then((res) => {
           this.loading = false;
-          this.queryResData = [];
           if (res.data.length != 0) {
             this.queryResData = [];
             this.$message.success("查询成功");
@@ -237,14 +187,10 @@ export default {
       this.loading = true;
       this.$http({
         method: "post",
-        url: "/api/query/getOutRecordLocateByTime",
-        data: {
-          customer_info: this.formData.customer_info,
-        },
+        url: "/api/query/getAllOutRecord",
       })
         .then((res) => {
           this.loading = false;
-          this.queryResData = [];
           this.queryResData = [];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
@@ -273,15 +219,17 @@ export default {
         method: "post",
         url: "/api/query/getOutRecordLocateByTime",
         data: {
-          customer_info: this.formData.customer_info,
+          customer_info: sessionStorage.getItem("userName"),
         },
       })
         .then((res) => {
           this.loading = false;
-          this.queryResData = [];
           console.log(res);
           this.queryResData = [];
           for (let item of res.data) {
+            if (item.out_source == "管理员") {
+              continue;
+            }
             if (item.status == "true") {
               // 如果状态显示已出库，则不显示在出库记录中，跳过此循环
               continue;
@@ -459,11 +407,7 @@ export default {
     this.today_date = today_date;
   },
   created() {
-    if (sessionStorage.getItem("userLevel") == "管理员") {
-    } else {
-      this.$message.warning("你没有权限使用此功能!");
-      this.$router.push("/");
-    }
+    let that = this;
   },
 };
 </script>

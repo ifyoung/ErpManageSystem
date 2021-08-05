@@ -6,7 +6,13 @@
     <div class="content-container">
       <el-row>
         <el-col style="width:40%">
-          <el-form :model="formData" ref="formData" :rules="rules" label-width="120px" label-position="left">
+          <el-form
+            :model="formData"
+            ref="formData"
+            :rules="rules"
+            label-width="120px"
+            label-position="left"
+          >
             <el-form-item label="客户信息" prop="customer_info">
               <el-autocomplete
                 style="width:100%"
@@ -30,7 +36,7 @@
       <el-row style="padding-top:5px;">
         <el-col class="customer-table" :span="24">
           <el-table
-            height="405"
+            :height="tableHeight"
             v-loading="loading"
             element-loading-text="加载中..."
             element-loading-custom-class="loading_color"
@@ -42,13 +48,41 @@
             stripe
             :data="queryResData_trading_pagination"
           >
-            <el-table-column align="center" type="selection" width="100px"></el-table-column>
-            <el-table-column align="center" label="客户编号" prop="customer_id"></el-table-column>
-            <el-table-column align="center" label="公司名称" prop="company_name"></el-table-column>
-            <el-table-column align="center" label="交易日期" prop="trading_date"></el-table-column>
-            <el-table-column align="center" label="内容" prop="trading_content"></el-table-column>
-            <el-table-column align="center" label="金额" prop="trading_amount"></el-table-column>
-            <el-table-column align="center" label="转账状态" prop="status"></el-table-column>
+            <el-table-column
+              align="center"
+              type="selection"
+              width="100px"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="客户编号"
+              prop="customer_id"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="公司名称"
+              prop="company_name"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="交易日期"
+              prop="trading_date"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="内容"
+              prop="trading_content"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="金额"
+              prop="trading_amount"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="转账状态"
+              prop="status"
+            ></el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -74,28 +108,60 @@
           <el-button class="add-btn" @click="addOpen">添加</el-button>
         </el-col>
         <el-col :span="18">
-          <el-button type="primary" :disabled="isModify" plain @click="modifyOpen">修改</el-button>
+          <el-button type="warning" :disabled="isModify" @click="modifyOpen"
+            >修改</el-button
+          >
         </el-col>
         <el-col :span="2">
-          <el-button type="danger" :disabled="isDel" @click="deleteSubmit">撤回</el-button>
+          <el-button type="danger" :disabled="isDel" @click="deleteSubmit"
+            >删除</el-button
+          >
         </el-col>
         <el-col :span="2">
-          <el-button type="info" plain @click="toggleSelection()">取消选择</el-button>
+          <el-button type="info" plain @click="toggleSelection()"
+            >取消选择</el-button
+          >
         </el-col>
       </el-row>
     </div>
 
-    <el-dialog title="-添加货品信息-" :visible.sync="addDV" width="35%" class="productPage-addForm" :before-close="handleClose">
-      <el-form :model="addForm" ref="addForm" :rules="addRules" label-width="150px">
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+    <el-dialog
+      :close-on-click-modal="false"
+      title="-添加流水信息-"
+      :visible.sync="addDV"
+      width="35%"
+      class="productPage-addForm"
+      :before-close="handleClose"
+    >
+      <el-form
+        :model="addForm"
+        ref="addForm"
+        :rules="addRules"
+        label-width="150px"
+      >
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
           <el-form-item prop="customer_id" label="客户编号:">
             <el-col :span="24" style="padding-left:20px">
-              <el-input v-model="addForm.customer_id"></el-input>
+              <el-autocomplete
+                style="width:100%"
+                v-model="addForm.customer_id"
+                :fetch-suggestions="dialogQuerySearch"
+                clearable
+                placeholder="客编模糊查询"
+              ></el-autocomplete>
             </el-col>
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
           <el-form-item prop="trading_date" label="日期:">
             <el-col :span="24" style="padding-left:20px">
               <el-date-picker
@@ -109,7 +175,11 @@
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
           <el-form-item prop="trading_content" label="内容:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.trading_content"></el-input>
@@ -117,15 +187,27 @@
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
-          <el-form-item prop="trading_amount" label="收入/支出金额:">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
+          <el-form-item
+            prop="trading_amount"
+            label="收入/支出金额:"
+            labelWidth="160px"
+          >
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.trading_amount"></el-input>
             </el-col>
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
           <el-form-item prop="status" label="转账状态:">
             <el-col :span="24" style="padding-left:20px">
               <el-select v-model="addForm.status">
@@ -144,17 +226,43 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="-修改货品信息-" :visible.sync="modifyDV" width="35%" class="productPage-addForm" :before-close="handleClose">
-      <el-form :model="modifyForm" ref="modifyForm" :rules="modifyRules" label-width="150px">
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+    <el-dialog
+      :close-on-click-modal="false"
+      title="-修改货品信息-"
+      :visible.sync="modifyDV"
+      width="35%"
+      class="productPage-addForm"
+      :before-close="handleCloseModify"
+    >
+      <el-form
+        :model="modifyForm"
+        ref="modifyForm"
+        :rules="modifyRules"
+        label-width="150px"
+      >
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
           <el-form-item prop="customer_id" label="客户编号:">
             <el-col :span="24" style="padding-left:20px">
-              <el-input v-model="modifyForm.customer_id"></el-input>
+              <el-autocomplete
+                style="width:100%"
+                v-model="modifyForm.customer_id"
+                :fetch-suggestions="dialogQuerySearch"
+                clearable
+                placeholder="客编模糊查询"
+              ></el-autocomplete>
             </el-col>
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
           <el-form-item prop="trading_date" label="日期:">
             <el-col :span="24" style="padding-left:20px">
               <el-date-picker
@@ -168,7 +276,11 @@
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
           <el-form-item prop="trading_content" label="内容:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="modifyForm.trading_content"></el-input>
@@ -176,15 +288,27 @@
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
-          <el-form-item prop="trading_amount" label="收入/支出金额:">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
+          <el-form-item
+            prop="trading_amount"
+            label="收入/支出金额:"
+            labelWidth="160px"
+          >
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="modifyForm.trading_amount"></el-input>
             </el-col>
           </el-form-item>
         </el-row>
 
-        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
           <el-form-item prop="status" label="转账状态:">
             <el-col :span="24" style="padding-left:20px">
               <el-select v-model="modifyForm.status">
@@ -199,17 +323,21 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="modifySubmit()">提 交</el-button>
-        <el-button type="primary" plain @click="modifyDV = false">取 消</el-button>
+        <el-button type="primary" plain @click="modifyDV = false"
+          >取 消</el-button
+        >
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { utcToCst } from "../utils/utcToCst";
+import { utcToCst } from "@/utils/utcToCst";
+import { getNowFormatDate } from "@/utils/getCurrentTime";
 export default {
   data() {
     return {
+      tableHeight: window.innerHeight * 0.65,
       times: 0, // 监听计数
       timer: null,
       loading: false, // 加载标识，默认为false,当调用接口时赋值为true
@@ -242,6 +370,8 @@ export default {
       queryResData_recharge: [], // 转账查询结果列表
       queryResData_trading: [], // 转账查询结果列表
       customer_info_list: [], // 模糊查询列表
+      customer_id_list: [], // 添加 模糊查询列表
+      addNameTipsArray: [], // 添加 提醒下拉框
       addForm: {
         customer_id: "",
         trading_date: "",
@@ -267,21 +397,87 @@ export default {
         status: "转账状态",
       },
       rules: {
-        customer_info: [{ message: "请输入客户信息", required: true, trigger: ["blur", "change"] }],
+        customer_info: [
+          {
+            message: "请输入客户信息",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       addRules: {
-        customer_id: [{ message: "请输入客户编号", required: true, trigger: ["blur", "change"] }],
-        trading_date: [{ message: "请选择转账时间", required: true, trigger: ["blur", "change"] }],
-        trading_content: [{ message: "请输入交易内容", required: true, trigger: ["blur", "change"] }],
-        trading_amount: [{ message: "请输入支出/收入金额", required: true, trigger: ["blur", "change"] }],
-        status: [{ message: "请选择转账状态", required: true, trigger: ["blur", "change"] }],
+        customer_id: [
+          {
+            message: "请输入客户编号",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        trading_date: [
+          {
+            message: "请选择转账时间",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        trading_content: [
+          {
+            message: "请输入交易内容",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        trading_amount: [
+          {
+            message: "请输入支出/收入金额",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        status: [
+          {
+            message: "请选择转账状态",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       modifyRules: {
-        customer_id: [{ message: "请输入客户编号", required: true, trigger: ["blur", "change"] }],
-        trading_date: [{ message: "请选择转账时间", required: true, trigger: ["blur", "change"] }],
-        trading_content: [{ message: "请输入交易内容", required: true, trigger: ["blur", "change"] }],
-        trading_amount: [{ message: "请输入支出/收入金额", required: true, trigger: ["blur", "change"] }],
-        status: [{ message: "请选择转账状态", required: true, trigger: ["blur", "change"] }],
+        customer_id: [
+          {
+            message: "请输入客户编号",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        trading_date: [
+          {
+            message: "请选择转账时间",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        trading_content: [
+          {
+            message: "请输入交易内容",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        trading_amount: [
+          {
+            message: "请输入支出/收入金额",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
+        status: [
+          {
+            message: "请选择转账状态",
+            required: true,
+            trigger: ["blur", "change"],
+          },
+        ],
       },
       queryPage: {
         // 分页器
@@ -293,6 +489,9 @@ export default {
   methods: {
     handleClose() {
       this.addDV = false;
+    },
+    handleCloseModify() {
+      this.modifyDV = false;
     },
     handleSizeChange(val) {
       this.queryPage.pageSize = val;
@@ -332,17 +531,6 @@ export default {
     },
     // 查询
     formSearch() {
-      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-        this.tradingReqUrl = "/api/query/getTradingByCustomerId";
-        this.tradingReqData = { customer_id: this.formData.customer_info };
-      } else if (this.formData.customer_info == "") {
-        this.tradingReqUrl = "/api/query/getAllTrading";
-        this.tradingReqData = {};
-      } else {
-        this.tradingReqUrl = "/api/query/getTradingByCompanyName";
-        this.tradingReqData = { company_name: this.formData.customer_info };
-      }
-
       this.getTrading();
     },
     // 搜索框模糊查询
@@ -354,16 +542,30 @@ export default {
         cb([{ value: "" }]);
       }
     },
+
+    // 添加 搜索框模糊查询
+    dialogQuerySearch(queruString, cb) {
+      if (this.addForm.customer_id != "") {
+        var addNameTipsArray = this.addNameTipsArray;
+        cb(addNameTipsArray);
+      } else {
+        cb([{ value: "" }]);
+      }
+    },
+
     // 获取交易信息的接口方法
     getTrading() {
       this.loading = true;
       this.$http({
         method: "post",
-        url: this.tradingReqUrl,
-        data: this.tradingReqData,
+        url: "api/query/getTradingByName",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -388,30 +590,6 @@ export default {
     },
     // 刷新查询
     refreshFormSearch() {
-      if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-        this.tradingReqUrl = "/api/query/getTradingByCustomerId";
-        // this.leaveAmountReqUrl = "/api/query/getLeaveAmountByCustomerId";
-        // this.rechargeReqUrl = "/api/query/getRechargeByCustomerId";
-
-        this.tradingReqData = { customer_id: this.formData.customer_info };
-        // this.leaveAmountReqData = { customer_id: this.formData.customer_info };
-        // this.rechargeReqData = { customer_id: this.formData.customer_info };
-      } else if (this.formData.customer_info == "") {
-        this.tradingReqUrl = "/api/query/getAllTrading";
-
-        this.tradingReqData = {};
-      } else {
-        this.tradingReqUrl = "/api/query/getTradingByCompanyName";
-        // this.leaveAmountReqUrl = "/api/query/getLeaveAmountByCompanyName";
-        // this.rechargeReqUrl = "/api/query/getRechargeByCompanyName";
-
-        this.tradingReqData = { company_name: this.formData.customer_info };
-        // this.leaveAmountReqData = { company_name: this.formData.customer_info };
-        // this.rechargeReqData = { company_name: this.formData.customer_info };
-      }
-
-      // this.getLeaveAmount();
-      // this.getRecharge();
       this.refreshGetTrading();
     },
     // 刷新获取交易信息
@@ -419,11 +597,14 @@ export default {
       this.loading = true;
       this.$http({
         method: "post",
-        url: this.tradingReqUrl,
-        data: this.tradingReqData,
+        url: "api/query/getTradingByName",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
@@ -462,17 +643,42 @@ export default {
     getData() {
       this.$http({
         method: "post",
-        url: this.locateReqUrl,
-        data: this.locateReqData,
+        url: "api/query/getTradingLocate",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
           this.customer_info_list = res.data;
           if (this.formData.customer_info != "") {
             this.nameTipsArray = [];
+            let avoidSameArr = [];
+            // 遍历模糊查询返回的列表,获取包含输入框关键字的字段,添加到历史列表中
+            // 并且,当历史列表已存在相同字段,则跳过此遍历阶段
             for (let item of this.customer_info_list) {
-              let obj = { value: "" };
-              obj.value = String(Object.values(item)[0]);
-              this.nameTipsArray.push(obj);
+              let flag = 0; // 用于标记是否需要跳过
+              // 遍历每个item对象
+              for (let prop in item) {
+                if (
+                  String(item[prop]).indexOf(this.formData.customer_info) != -1
+                ) {
+                  // 对防重数组遍历,若存在与历史列表对象中完全匹配的属性,则跳过此遍历
+                  for (let val of avoidSameArr) {
+                    if (val == item[prop]) {
+                      flag = 1;
+                      break;
+                    }
+                  }
+                  if (flag == 0) {
+                    this.nameTipsArray.push({
+                      value: String(item[prop]),
+                    });
+                    avoidSameArr.push(String(item[prop]));
+                  } else {
+                    continue;
+                  }
+                }
+              }
             }
           }
         })
@@ -480,6 +686,62 @@ export default {
           this.$message.error(err);
         });
     },
+
+    // 监听添加输入框，有变动就触发防抖函数
+    getDialogData() {
+      let prop;
+      if (this.modifyDV == true) {
+        prop = this.modifyForm.customer_id;
+      } else if (this.addDV == true) {
+        prop = this.addForm.customer_id;
+      }
+      this.$http({
+        method: "post",
+        url: "api/query/getCustomerDialogLocate",
+        data: {
+          customer_info: prop,
+        },
+      })
+        .then((res) => {
+          this.customer_info_list = [];
+          this.customer_id_list = res.data;
+          if (this.addForm.customer_id != "") {
+            this.addNameTipsArray = [];
+            let avoidSameArr = [];
+            // 遍历模糊查询返回的列表,获取包含输入框关键字的字段,添加到历史列表中
+            // 并且,当历史列表已存在相同字段,则跳过此遍历阶段
+            for (let item of this.customer_id_list) {
+              let flag = 0; // 用于标记是否需要跳过
+              // 遍历每个item对象
+              for (let prop in item) {
+                if (
+                  String(item[prop]).indexOf(this.addForm.customer_id) != -1
+                ) {
+                  // 对防重数组遍历,若存在与历史列表对象中完全匹配的属性,则跳过此遍历
+                  for (let val of avoidSameArr) {
+                    if (val == item[prop]) {
+                      flag = 1;
+                      break;
+                    }
+                  }
+                  if (flag == 0) {
+                    this.addNameTipsArray.push({
+                      value: String(item[prop]),
+                    });
+                    avoidSameArr.push(String(item[prop]));
+                  } else {
+                    continue;
+                  }
+                }
+              }
+            }
+          }
+        })
+        .catch((err) => {
+          this.$message.error(err);
+        });
+    },
+
     // 防抖函数
     debounce(fn, wait) {
       clearTimeout(this.timer);
@@ -512,7 +774,9 @@ export default {
       })
         .then((res) => {
           if (res.data.length == 0) {
-            this.$message.warning(`不存在编号为${this.addForm.customer_id}的客户，请重新输入！`);
+            this.$message.warning(
+              `不存在编号为${this.addForm.customer_id}的客户，请重新输入！`
+            );
           } else {
             this.addSubmit();
           }
@@ -522,13 +786,13 @@ export default {
     // 打开添加信息框
     addOpen() {
       if (this.queryResData_leaveAmount.length != 0) {
-        this.addForm.customer_id = this.queryResData_leaveAmount[0].customer_id;
+        this.addForm.customer_id = this.queryResData_trading[0].customer_id;
       }
       this.addDV = true;
     },
     // 打开修改信息框
     modifyOpen() {
-      this.modifyForm.customer_id = this.queryResData_leaveAmount[0].customer_id;
+      this.modifyForm.customer_id = this.queryResData_trading[0].customer_id;
 
       this.modifyForm.trading_code = this.multipleSelection[0].trading_code;
       this.modifyForm.trading_amount = this.multipleSelection[0].trading_amount;
@@ -580,7 +844,7 @@ export default {
           this.$message.error(err);
         });
     },
-    // 撤回提交
+    // 删除提交
     deleteSubmit() {
       if (this.multipleSelection.length != 0) {
         this.solidSelection = this.multipleSelection;
@@ -604,20 +868,20 @@ export default {
   watch: {
     formData: {
       handler: function(nV, oV) {
-        // 对输入框的值做判断，为数字则请求id，为汉字则请求公司名称
-        if (/[0-9a-z]/i.test(this.formData.customer_info)) {
-          this.locateReqUrl = "/api/query/getLocateCustomerId";
-          this.locateReqData = { customer_id: nV.customer_info };
-        } else {
-          this.locateReqUrl = "api/query/getLocateCompanyName";
-          this.locateReqData = { company_name: nV.customer_info };
-        }
         this.debounce(this.getData, 1000);
       },
       deep: true,
     },
     addForm: {
-      handler: function(nV, oV) {},
+      handler: function(nV, oV) {
+        this.debounce(this.getDialogData, 1000);
+      },
+      deep: true,
+    },
+    modifyForm: {
+      handler: function(nV, oV) {
+        this.debounce(this.getDialogData, 1000);
+      },
       deep: true,
     },
   },
@@ -625,29 +889,40 @@ export default {
     queryResData_trading_pagination() {
       let size = this.queryPage.pageSize;
       let current = this.queryPage.currentPage;
-      return this.queryResData_trading.slice(size * (current - 1), size * current);
+      return this.queryResData_trading.slice(
+        size * (current - 1),
+        size * current
+      );
     },
     queryResData_recharge_pagination() {
       let size = this.queryPage.pageSize;
       let current = this.queryPage.currentPage;
-      return this.queryResData_recharge.slice(size * (current - 1), size * current);
+      return this.queryResData_recharge.slice(
+        size * (current - 1),
+        size * current
+      );
     },
   },
   mounted() {
     var today = new Date();
     today.setTime(today.getTime());
-    var today_date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+    var today_date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
     this.today_date = today_date;
 
     this.refreshFormSearch();
   },
-    created() {
-      if (sessionStorage.getItem("userLevel") == "管理员") {   
+  created() {
+    if (sessionStorage.getItem("userLevel") == "管理员") {
     } else {
-     this.$message.warning("你没有权限使用此功能!");
+      this.$message.warning("你没有权限使用此功能!");
       this.$router.push("/");
     }
-  }
+  },
 };
 </script>
 
@@ -658,6 +933,4 @@ export default {
     padding-left: 20px;
   }
 }
-
-
 </style>
