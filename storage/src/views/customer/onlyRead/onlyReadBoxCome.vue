@@ -34,7 +34,7 @@
             ></el-table-column>
             <el-table-column
               align="center"
-              label="名称"
+              label="箱号"
               prop="product_name"
               width="200px"
             ></el-table-column>

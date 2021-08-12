@@ -85,6 +85,12 @@
               prop="come_time"
              width="130"
             ></el-table-column>
+                        <el-table-column
+              align="center"
+              label="出库时间"
+              prop="out_time"
+             width="130"
+            ></el-table-column>
             <el-table-column
               align="center"
               label="仓储天数"
@@ -95,12 +101,6 @@
               align="center"
               label="仓储数量"
               prop="count"
-              width="130"
-            ></el-table-column>
-            <el-table-column
-              align="center"
-              label="出库数量"
-              prop="out_count"
               width="130"
             ></el-table-column>
             <el-table-column align="center" label="出库操作" width="200px">
@@ -326,9 +326,18 @@ export default {
             this.$message.success("查询成功");
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
-              let today = Date.parse(new Date(this.today_date));
-              var day = parseInt((today - come) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
-              item.save_days = day;
+            
+              let out = Date.parse(new Date(item.out_time));
+              if(item.out_count==0){
+                item.save_days = 0;
+                item.out_time="未出库"
+              }else{
+                var day = parseInt((out - come) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
+                item.save_days = day;
+                 item.out_time = utcToCst(item.out_time)
+                .slice(0, 10)
+                .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+              }
 
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
@@ -360,13 +369,21 @@ export default {
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
-              let today = Date.parse(new Date(this.today_date));
-              var day = parseInt((today - come) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
-              item.save_days = day;
-
+              let out = Date.parse(new Date(item.out_time));
+              if(item.out_count==0){
+                item.save_days = 0;
+                item.out_time="未出库"
+              }else{
+                var day = parseInt((out - come) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
+                item.save_days = day;
+                 item.out_time = utcToCst(item.out_time)
+                .slice(0, 10)
+                .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+              }
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+             
               item.operateCount = "";
             }
             this.queryResData = res.data;
@@ -477,7 +494,7 @@ export default {
         Number(row.out_count) + Number(row.operateCount) >
         Number(row.count)
       ) {
-        this.$message.warning("出货的数量已超过初始仓储数量");
+        this.$message.warning("出库失败，仓储货物不足");
         return;
       } else if (Number(row.count) < 0) {
         this.$message.warning("出货的数量不能为负数");
@@ -485,7 +502,10 @@ export default {
       }
       this.$confirm("确认提交吗?")
         .then(() => {
-          row.out_count = String(
+          row.count = String(
+            Number(row.count) - Number(row.operateCount)
+          );
+          row.out_count= String(
             Number(row.out_count) + Number(row.operateCount)
           );
           let data = {};
@@ -498,7 +518,7 @@ export default {
           }
           data.out_time = getNowFormatDate();
 
-          this.updateBox(data, record_code);
+          this.updateBox(data);
           this.insertOutRecord(data, row, record_code);
         })
         .catch((err) => {
@@ -557,7 +577,7 @@ export default {
         // 获取库存天数
         if (this.addForm.come_time != "") {
           var a1 = Date.parse(new Date(nV.come_time));
-          var a2 = Date.parse(new Date(this.today_date));
+          var a2 = Date.parse(new Date(nV.out_time));
           var day = parseInt((a2 - a1) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
           nV.save_days = day + 1;
         }
