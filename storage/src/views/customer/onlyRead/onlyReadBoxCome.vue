@@ -4,6 +4,34 @@
       <h1>箱子入库</h1>
     </div>
     <div class="content-container">
+     <el-row>
+        <el-col :span="10">
+          <el-form
+            :model="formData"
+            ref="formData"
+            label-width="100px"
+            label-position="left"
+          >
+            <el-form-item label="客户信息:" prop="customer_info">
+              <el-autocomplete
+                style="width:100%"
+                v-model="formData.customer_info"
+                :fetch-suggestions="querySearch"
+                clearable
+                id="formSearch"
+                placeholder="请输入客户编号或公司名称，为空时查询所有"
+              ></el-autocomplete>
+            </el-form-item>
+          </el-form>
+        </el-col>
+        <el-col style="margin-left:10px;" :span="2">
+          <el-button type="primary" @click="formSearch">查询</el-button>
+        </el-col>
+        <el-col :span="2">
+          <el-button type="info" @click="resetForm('formData')">重置</el-button>
+        </el-col>
+      </el-row>
+    
       <el-row>
         <el-col class="customer-table" :span="24">
           <el-table
@@ -394,16 +422,20 @@ export default {
       this.refreshGetBox();
     },
 
-    // 获取箱子信息
+      // 获取箱子信息
     getBox() {
+      this.loading = true;
       this.$http({
         method: "post",
-        url: "api/query/getBoxLocateByTime",
+        url: "api/query/getSingleBoxLocateByName",
         data: {
           customer_info: this.formData.customer_info,
+          customer_id:this.customer_id
         },
       })
         .then((res) => {
+          this.loading = false;
+          this.queryResData = [];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -415,8 +447,8 @@ export default {
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+              item.leave_count = Number(item.count) - Number(item.out_count);
             }
-            console.log(res.data);
             this.queryResData = res.data;
           } else {
             this.$message.warning("未查询到相关数据");
@@ -426,18 +458,20 @@ export default {
           this.$message.error(err);
         });
     },
-    // 刷新箱子信息列表
+     // 刷新箱子信息列表
     refreshGetBox() {
       this.loading = true;
       this.$http({
         method: "post",
-        url: "api/query/getBoxLocateByTime",
+        url: "api/query/getBoxLocateByName",
         data: {
-          customer_info:  sessionStorage.getItem("userName"),
+          customer_info: this.customer_id,
         },
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
+          console.log(res);
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
@@ -448,6 +482,7 @@ export default {
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+              item.leave_count = Number(item.count) - Number(item.out_count);
             }
             this.queryResData = res.data;
           }
@@ -604,8 +639,9 @@ export default {
 
     this.refreshGetBox();
   },
-  created() {
-    let that = this;
+ created() {
+    this.customer_id = sessionStorage.getItem("userName");
+    this.level = sessionStorage.getItem("userLevel");
   },
 };
 </script>

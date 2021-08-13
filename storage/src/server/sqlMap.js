@@ -19,12 +19,28 @@ var sqlMap = {
     // (名称排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
     getProductLocateByName: `SELECT p.*,c.company_name FROM product p,customer_info c WHERE CONCAT(p.customer_id,c.company_name,p.product_name,p.product_sku) LIKE CONCAT("%",?,"%") and p.customer_id = c.customer_id ORDER BY product_name desc`,
 
+
+     // (已知客户编号)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+     getSingleProductLocate: `SELECT c.company_name,p.product_name,p.product_sku FROM product p,customer_info c WHERE CONCAT(c.company_name,p.product_name,p.product_sku) LIKE CONCAT("%",?,"%") and p.customer_id = ? `,
+     // (已知客户编号)(时间排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+     getSingleProductLocateByTime: `SELECT p.*,c.company_name FROM product p,customer_info c WHERE CONCAT(c.company_name,p.product_name,p.product_sku) LIKE CONCAT("%",?,"%") and p.customer_id = c.customer_id and p.customer_id = ? ORDER BY come_time desc`,
+      // (已知客户编号)(时间排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+      getSingleProductLocateByName: `SELECT p.*,c.company_name FROM product p,customer_info c WHERE CONCAT(c.company_name,p.product_name,p.product_sku) LIKE CONCAT("%",?,"%") and p.customer_id = c.customer_id and p.customer_id = ?  ORDER BY product_name desc`,
+
     // (箱子管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
     getBoxLocate: `SELECT b.customer_id,c.company_name,b.product_name FROM box b,customer_info c WHERE CONCAT(b.customer_id,c.company_name,b.product_name) LIKE CONCAT("%",?,"%")`,
     // (时间排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
     getBoxLocateByTime: `SELECT b.*,c.company_name FROM box b,customer_info c WHERE CONCAT(b.customer_id,c.company_name,b.product_name) LIKE CONCAT("%",?,"%") and b.customer_id = c.customer_id ORDER BY come_time desc`,
     // (名称排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
     getBoxLocateByName: `SELECT b.*,c.company_name FROM box b,customer_info c WHERE CONCAT(b.customer_id,c.company_name,b.product_name) LIKE CONCAT("%",?,"%") and b.customer_id = c.customer_id ORDER BY product_name desc`,
+
+     // (已知客户编号)(箱子管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+     getSingleBoxLocate: `SELECT c.company_name,b.product_name FROM box b,customer_info c WHERE CONCAT(c.company_name,b.product_name) LIKE CONCAT("%",?,"%") and b.customer_id = ? `,
+     // (已知客户编号)(时间排序)(箱子管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+     getSingleBoxLocateByTime: `SELECT b.*,c.company_name FROM box b,customer_info c WHERE CONCAT(c.company_name,b.product_name) LIKE CONCAT("%",?,"%") and b.customer_id = c.customer_id and b.customer_id = ? ORDER BY come_time desc`,
+      // (已知客户编号)(时间排序)(箱子管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+      getSingleBoxLocateByName: `SELECT b.*,c.company_name FROM box b,customer_info c WHERE CONCAT(c.company_name,b.product_name) LIKE CONCAT("%",?,"%") and b.customer_id = c.customer_id  and b.customer_id = ?  ORDER BY product_name desc`,
+
 
     // 依据客户id或者所属公司获取客户 剩余金额 信息
     getLeaveAmountByCustomerId: `SELECT customer_id,leave_amount from customer_info where customer_id = ?`,

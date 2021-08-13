@@ -7,14 +7,47 @@
     <div class="content-container">
       <el-row>
         <el-col style="width:auto">
-          <p class="customer_id_style">客户编号:{{ customer_id }}</p>
+          <span class="customer_id_style">客户编号:{{ customer_id }}</span>
         </el-col>
-        <el-col :span="3" style="margin-left:2%">
-          <el-button :class="[isNoClick == true ? 'disabled-btn' : 'add-btn']" :disabled="isNoClick" @click="addOpen"
+      </el-row>
+
+      <el-row>
+        <el-col :span="7">
+          <el-form
+            :model="formData"
+            ref="formData"
+            label-width="0"
+            label-position="left"
+          >
+            <el-form-item prop="customer_info">
+              <el-autocomplete
+                style="width:100%"
+                v-model="formData.customer_info"
+                :fetch-suggestions="querySearch"
+                clearable
+                id="formSearch"
+                placeholder="请输入客户编号或公司名称，为空时查询所有"
+              ></el-autocomplete>
+            </el-form-item>
+          </el-form>
+        </el-col>
+        <el-col style="margin-left:10px;" :span="2">
+          <el-button type="primary" @click="formSearch">查询</el-button>
+        </el-col>
+        <el-col :span="2">
+          <el-button type="info" @click="resetForm('formData')">重置</el-button>
+        </el-col>
+
+        <el-col :span="3" style="margin-left:1%">
+          <el-button
+            :class="[isNoClick == true ? 'disabled-btn' : 'add-btn']"
+            :disabled="isNoClick"
+            @click="addOpen"
             >点击填写地址(勾选后点击,若多选则提交同一地址)</el-button
           >
         </el-col>
       </el-row>
+
       <el-row>
         <el-col class="customer-table" :span="24">
           <el-table
@@ -31,20 +64,51 @@
             :data="computedQueryResData"
             ref="multipleTable"
           >
-            <el-table-column align="center" type="selection" width="100px"></el-table-column>
-            <el-table-column align="center" label="产品名称" prop="product_name"></el-table-column>
-            <el-table-column align="center" label="产品sku" prop="product_sku"></el-table-column>
-            <el-table-column align="center" label="入仓数量" prop="storage_count"></el-table-column>
-            <el-table-column align="center" label="剩余数量" prop="leave_count"></el-table-column>
+            <el-table-column
+              align="center"
+              type="selection"
+              width="100px"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="产品名称"
+              prop="product_name"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="产品sku"
+              prop="product_sku"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="入仓数量"
+              prop="storage_count"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="剩余数量"
+              prop="leave_count"
+            ></el-table-column>
             <el-table-column align="center" label="下单数量">
               <template slot-scope="scope">
                 <div class="sa-container">
-                  <el-input placeholder="请输入" v-model="scope.row.count"></el-input>
+                  <el-input
+                    placeholder="请输入"
+                    v-model="scope.row.count"
+                  ></el-input>
                 </div>
               </template>
             </el-table-column>
-            <el-table-column align="center" label="入库时间" prop="come_time"></el-table-column>
-            <el-table-column align="center" label="仓储天数" prop="save_days"></el-table-column>
+            <el-table-column
+              align="center"
+              label="入库时间"
+              prop="come_time"
+            ></el-table-column>
+            <el-table-column
+              align="center"
+              label="仓储天数"
+              prop="save_days"
+            ></el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -75,63 +139,99 @@
       :before-close="handleClose"
     >
       <el-form v-model="addForm" ref="addForm" label-width="340px">
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:25px"
+        >
           <el-form-item required label="买家地址 Enter customer address:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.customer_address"></el-input>
             </el-col>
           </el-form-item>
         </el-row>
-        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
           <el-form-item required label="全名 Full name:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.full_name"></el-input>
             </el-col>
           </el-form-item>
         </el-row>
-        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
           <el-form-item required label="街道地址1 Street address1:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.street_address1"></el-input>
             </el-col>
           </el-form-item>
         </el-row>
-        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
           <el-form-item required label="街道地址2 Street address2:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.street_address2"></el-input>
             </el-col>
           </el-form-item>
         </el-row>
-        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
           <el-form-item required label="城市 City:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.city"></el-input>
             </el-col>
           </el-form-item>
         </el-row>
-        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
           <el-form-item required label="州/省 State/Province:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.province"></el-input>
             </el-col>
           </el-form-item>
         </el-row>
-        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
           <el-form-item required label="邮编 Zip / Postal code:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.zip"></el-input>
             </el-col>
           </el-form-item>
         </el-row>
-        <el-row type="flex" justify="center" style="margin-bottom:25px;margin-top:25px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:25px;margin-top:25px"
+        >
           <el-form-item label="手机电话(可选) Phone number:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.phone_number"></el-input>
             </el-col>
           </el-form-item>
         </el-row>
-        <el-row type="flex" justify="center" style="margin-bottom:10px;margin-top:15px">
+        <el-row
+          type="flex"
+          justify="center"
+          style="margin-bottom:10px;margin-top:15px"
+        >
           <el-form-item label="邮箱地址(可选) Email address:">
             <el-col :span="24" style="padding-left:20px">
               <el-input v-model="addForm.email_address"></el-input>
@@ -248,19 +348,35 @@ export default {
       form.resetFields();
     },
 
-    // 刷新查询
-    refreshFormSearch() {
+    // 搜索框模糊查询
+    querySearch(queruString, cb) {
+      if (this.formData.customer_info != "") {
+        var nameTipsArray = this.nameTipsArray;
+        cb(nameTipsArray);
+      } else {
+        cb([
+          {
+            value: "",
+          },
+        ]);
+      }
+    },
+
+    // 查询
+    formSearch() {
       this.loading = true;
       this.$http({
         method: "post",
-        url: "/api/query/getProductLocateByTime",
+        url: "/api/query/getSingleProductLocateByTime",
         data: {
-          customer_info: this.customer_id,
+          customer_info: this.formData.customer_info,
+          customer_id: this.customer_id,
         },
       })
         .then((res) => {
           console.log(res);
-         this.loading = false; this.queryResData=[];
+          this.loading = false;
+          this.queryResData = [];
           if (res.data.length != 0) {
             console.log(res);
             this.queryResData = [];
@@ -273,7 +389,47 @@ export default {
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
 
-              item.leave_count = Number(item.storage_count) - Number(item.out_count);
+              item.leave_count =
+                Number(item.storage_count) - Number(item.out_count);
+              item.count = "";
+              this.queryResData.push(item);
+            }
+            console.log(this.queryResData);
+          }
+        })
+        .catch((err) => {
+          this.$message.error(err);
+        });
+    },
+
+    // 刷新查询
+    refreshFormSearch() {
+      this.loading = true;
+      this.$http({
+        method: "post",
+        url: "/api/query/getProductLocateByTime",
+        data: {
+          customer_info: this.customer_id,
+        },
+      })
+        .then((res) => {
+          console.log(res);
+          this.loading = false;
+          this.queryResData = [];
+          if (res.data.length != 0) {
+            console.log(res);
+            this.queryResData = [];
+            for (let item of res.data) {
+              let come = Date.parse(new Date(item.come_time));
+              let today = Date.parse(new Date(this.today_date));
+              var day = parseInt((today - come) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
+              item.save_days = day;
+              item.come_time = utcToCst(item.come_time)
+                .slice(0, 10)
+                .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+
+              item.leave_count =
+                Number(item.storage_count) - Number(item.out_count);
               item.count = "";
               this.queryResData.push(item);
             }
@@ -291,6 +447,20 @@ export default {
       for (let item of this.solidSelection) {
         if (item.count == "") {
           this.$message.warning("存在未填写'下单数量'的勾选项,请检查！");
+          return;
+        }
+
+        if (item.count < 0) {
+          this.$message.warning("下单数量不能为负数!");
+          return;
+        }
+
+        if (item.count > item.leave_count) {
+          this.$message.warning("下单数量超额!");
+          return;
+        }
+        if (isNaN(Number(item.count))) {
+          this.$message.warning("存在非数字字符!");
           return;
         }
       }
@@ -377,8 +547,75 @@ export default {
         })
         .catch((err) => {});
     },
+
+    // 监听输入框，有变动就触发防抖函数
+    getData() {
+      this.$http({
+        method: "post",
+        url: "api/query/getSingleProductLocate",
+        data: {
+          customer_info: this.formData.customer_info,
+          customer_id: this.customer_id,
+        },
+      })
+        .then((res) => {
+          this.customer_info_list = res.data;
+          if (this.formData.customer_info != "") {
+            this.nameTipsArray = [];
+            let avoidSameArr = [];
+            // 遍历模糊查询返回的列表,获取包含输入框关键字的字段,添加到历史列表中
+            // 并且,当历史列表已存在相同字段,则跳过此遍历阶段
+            for (let item of this.customer_info_list) {
+              let flag = 0; // 用于标记是否需要跳过
+              // 遍历每个item对象
+
+              for (let prop in item) {
+                if (
+                  String(item[prop]).indexOf(this.formData.customer_info) != -1
+                ) {
+                  // 对防重数组遍历,若存在与历史列表对象中完全匹配的属性,则跳过此遍历
+                  for (let val of avoidSameArr) {
+                    if (val == item[prop]) {
+                      flag = 1;
+                      break;
+                    }
+                  }
+                  if (flag == 0) {
+                    if (prop == "company_name") {
+                      continue;
+                    }
+                    this.nameTipsArray.push({
+                      value: String(item[prop]),
+                    });
+                    avoidSameArr.push(String(item[prop]));
+                  } else {
+                    continue;
+                  }
+                }
+              }
+            }
+          }
+        })
+        .catch((err) => {
+          this.$message.error(err);
+        });
+    },
+    // 防抖函数
+    debounce(fn, wait) {
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
+        fn();
+      }, wait);
+    },
   },
-  watch: {},
+  watch: {
+    formData: {
+      handler: function(nV, oV) {
+        this.debounce(this.getData, 1000);
+      },
+      deep: true,
+    },
+  },
   computed: {
     computedQueryResData() {
       let size = this.queryPage.pageSize;
@@ -389,7 +626,12 @@ export default {
   mounted() {
     var today = new Date();
     today.setTime(today.getTime());
-    var today_date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+    var today_date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate();
     this.today_date = today_date;
 
     this.refreshFormSearch();

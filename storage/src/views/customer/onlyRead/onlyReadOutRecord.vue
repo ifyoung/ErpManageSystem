@@ -5,6 +5,33 @@
     </div>
 
     <div class="content-container">
+      <el-row>
+        <el-col :span="10">
+          <el-form
+            :model="formData"
+            ref="formData"
+            label-width="100px"
+            label-position="left"
+          >
+            <el-form-item label="客户信息:" prop="customer_info">
+              <el-autocomplete
+                style="width:100%"
+                v-model="formData.customer_info"
+                :fetch-suggestions="querySearch"
+                clearable
+                id="formSearch"
+                placeholder="请输入客户编号或公司名称，为空时查询所有"
+              ></el-autocomplete>
+            </el-form-item>
+          </el-form>
+        </el-col>
+        <el-col style="margin-left:10px;" :span="2">
+          <el-button type="primary" @click="formSearch">查询</el-button>
+        </el-col>
+        <el-col :span="2">
+          <el-button type="info" @click="resetForm('formData')">重置</el-button>
+        </el-col>
+      </el-row>
       <el-row style="padding-top:5px">
         <el-col class="customer-table" :span="24">
           <el-table
@@ -14,13 +41,17 @@
             element-loading-custom-class="loading_color"
             element-loading-spinner="el-icon-loading"
             element-loading-background="rgba(0, 0, 0, 0.5)"
-            @selection-change="handleSelectionChange"
             :row-style="showRow"
             border
             stripe
             :data="computedQueryResData"
             ref="multipleTable"
           >
+            <el-table-column
+              align="center"
+              label="客户编号"
+              prop="customer_id"
+            ></el-table-column>
             <el-table-column
               align="center"
               label="公司名称"
@@ -47,6 +78,11 @@
               label="出库数量"
               prop="out_count"
             ></el-table-column>
+            <el-table-column
+              align="center"
+              label="操作者"
+              prop="out_source"
+            ></el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -67,8 +103,8 @@
         </el-col>
       </el-row>
     </div>
-  </div>
-</template>
+  </div> </template
+>
 
 <script>
 import { utcToCst } from "@/utils/utcToCst";
@@ -120,16 +156,6 @@ export default {
 
       return styleJson; // 返回对象
     },
-    // 监听勾选
-    handleSelectionChange(val) {
-      console.log(val);
-      if (val.length == 0) {
-        this.isDel = true;
-      } else {
-        this.isDel = false;
-      }
-      this.multipleSelection = val;
-    },
     // 重置
     resetForm(formName) {
       let form = this.$refs[formName];
@@ -160,6 +186,7 @@ export default {
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
           if (res.data.length != 0) {
             this.queryResData = [];
             this.$message.success("查询成功");
@@ -187,10 +214,14 @@ export default {
       this.loading = true;
       this.$http({
         method: "post",
-        url: "/api/query/getAllOutRecord",
+        url: "/api/query/getOutRecordLocateByTime",
+        data: {
+          customer_info: this.formData.customer_info,
+        },
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
           this.queryResData = [];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
@@ -219,21 +250,22 @@ export default {
         method: "post",
         url: "/api/query/getOutRecordLocateByTime",
         data: {
-          customer_info: sessionStorage.getItem("userName"),
+          customer_info: this.formData.customer_info,
         },
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
           console.log(res);
           this.queryResData = [];
           for (let item of res.data) {
-            if (item.out_source == "管理员") {
-              continue;
-            }
             if (item.status == "true") {
               // 如果状态显示已出库，则不显示在出库记录中，跳过此循环
               continue;
             } else {
+              if(item.out_source=="管理员"){
+                continue;
+              }
               item.out_time = utcToCst(item.out_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
@@ -246,75 +278,6 @@ export default {
         });
     },
 
-    // 删除提交
-    deleteSubmit() {
-      this.$confirm("确定删除出库记录信息?")
-        .then(() => {
-          this.solidSelection = this.multipleSelection;
-          while (this.solidSelection.length != 0) {
-            this.withdrawOutRecord();
-            // this.deleteOutRecord();
-            this.solidSelection.shift();
-          }
-          this.$message.success("删除出库记录信息成功!");
-        })
-        .catch((err) => {
-          this.$message.warning("取消删除");
-        });
-    },
-    // 删除 出库记录 信息
-    deleteOutRecord() {
-      this.$http({
-        method: "post",
-        url: "api/delete/deleteOutRecord",
-        data: {
-          customer_id: this.solidSelection[0].customer_id,
-          product_name: this.solidSelection[0].product_name,
-          product_sku: this.solidSelection[0].product_sku,
-          out_time: this.solidSelection[0].out_time,
-          out_count: this.solidSelection[0].out_count,
-          record_code: this.solidSelection[0].record_code,
-        },
-      })
-        .then((res) => {
-          this.refreshGetAllOutRecord();
-        })
-        .catch((err) => {
-          this.$message.error(err);
-        });
-    },
-    // 撤回 出库记录 信息
-    withdrawOutRecord() {
-      let url = "api/update/updateOutRecordWithBox";
-      let data = {
-        status: "true",
-        customer_id: this.solidSelection[0].customer_id,
-        product_name: this.solidSelection[0].product_name,
-        product_sku: this.solidSelection[0].product_sku,
-        out_count: this.solidSelection[0].out_count,
-        out_time: this.solidSelection[0].out_time,
-        record_code: this.solidSelection[0].record_code,
-      };
-      if (this.solidSelection[0].product_sku != "---") {
-        url = "api/update/updateOutRecordWithProduct";
-      }
-
-      console.log(this.solidSelection[0]);
-      console.log(url);
-      console.log(data);
-
-      this.$http({
-        method: "post",
-        url: url,
-        data: data,
-      })
-        .then((res) => {
-          this.refreshGetAllOutRecord();
-        })
-        .catch((err) => {
-          this.$message.error(err);
-        });
-    },
 
     // 监听输入框，有变动就触发防抖函数
     getData() {
@@ -407,7 +370,6 @@ export default {
     this.today_date = today_date;
   },
   created() {
-    let that = this;
   },
 };
 </script>

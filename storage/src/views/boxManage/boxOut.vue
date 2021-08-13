@@ -83,13 +83,13 @@
               align="center"
               label="入库时间"
               prop="come_time"
-             width="130"
+              width="130"
             ></el-table-column>
-                        <el-table-column
+            <el-table-column
               align="center"
               label="出库时间"
               prop="out_time"
-             width="130"
+              width="130"
             ></el-table-column>
             <el-table-column
               align="center"
@@ -321,22 +321,23 @@ export default {
         },
       })
         .then((res) => {
-         this.loading = false; this.queryResData=[];
+          this.loading = false;
+          this.queryResData = [];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
-            
+
               let out = Date.parse(new Date(item.out_time));
-              if(item.out_count==0){
+              if (item.out_count == 0) {
                 item.save_days = 0;
-                item.out_time="未出库"
-              }else{
+                item.out_time = "未出库";
+              } else {
                 var day = parseInt((out - come) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
                 item.save_days = day;
-                 item.out_time = utcToCst(item.out_time)
-                .slice(0, 10)
-                .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+                item.out_time = utcToCst(item.out_time)
+                  .slice(0, 10)
+                  .replace(/上|下|中|午|晚|早|凌|晨/g, "");
               }
 
               item.come_time = utcToCst(item.come_time)
@@ -365,25 +366,26 @@ export default {
         },
       })
         .then((res) => {
-         this.loading = false; this.queryResData=[];
+          this.loading = false;
+          this.queryResData = [];
           if (res.data.length != 0) {
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
               let out = Date.parse(new Date(item.out_time));
-              if(item.out_count==0){
+              if (item.out_count == 0) {
                 item.save_days = 0;
-                item.out_time="未出库"
-              }else{
+                item.out_time = "未出库";
+              } else {
                 var day = parseInt((out - come) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
                 item.save_days = day;
-                 item.out_time = utcToCst(item.out_time)
-                .slice(0, 10)
-                .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+                item.out_time = utcToCst(item.out_time)
+                  .slice(0, 10)
+                  .replace(/上|下|中|午|晚|早|凌|晨/g, "");
               }
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
-             
+
               item.operateCount = "";
             }
             this.queryResData = res.data;
@@ -499,13 +501,14 @@ export default {
       } else if (Number(row.count) < 0) {
         this.$message.warning("出货的数量不能为负数");
         return;
+      } else if (isNaN(Number(row.count))) {
+        this.$message.warning("存在非数字字符!");
+        return;
       }
       this.$confirm("确认提交吗?")
         .then(() => {
-          row.count = String(
-            Number(row.count) - Number(row.operateCount)
-          );
-          row.out_count= String(
+          row.count = String(Number(row.count) - Number(row.operateCount));
+          row.out_count = String(
             Number(row.out_count) + Number(row.operateCount)
           );
           let data = {};

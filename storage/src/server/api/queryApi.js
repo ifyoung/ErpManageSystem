@@ -442,6 +442,36 @@ router.post("/getProductLocateByTime", (req, res) => {
   });
 });
 
+// (已知客户编号)(时间排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getSingleProductLocateByTime", (req, res) => {
+  var sql = $sql.query.getSingleProductLocateByTime;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info,parms.customer_id], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (已知客户编号)(名称排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getSingleProductLocateByName", (req, res) => {
+  var sql = $sql.query.getSingleProductLocateByName;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info,parms.customer_id], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
 // (名称排序)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
 router.post("/getProductLocateByName", (req, res) => {
   var sql = $sql.query.getProductLocateByName;
@@ -456,6 +486,37 @@ router.post("/getProductLocateByName", (req, res) => {
     }
   });
 });
+
+// (货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getProductLocate", (req, res) => {
+  var sql = $sql.query.getProductLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+  // (已知客户编号)(货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getSingleProductLocate", (req, res) => {
+  var sql = $sql.query.getSingleProductLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info,parms.customer_id], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
 
 // (货物管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
 router.post("/getBoxLocate", (req, res) => {
@@ -493,6 +554,52 @@ router.post("/getBoxLocateByName", (req, res) => {
   var parms = req.body;
   console.log(parms);
   conn.query(sql, [parms.customer_info], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+
+// (已知客户编号)(箱子管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getSingleBoxLocate", (req, res) => {
+  var sql = $sql.query.getSingleBoxLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info,parms.customer_id], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (已知客户编号)(时间排序)(箱子管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getSingleBoxLocateByTime", (req, res) => {
+  var sql = $sql.query.getSingleBoxLocateByTime;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info,parms.customer_id], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+// (已知客户编号)(时间排序)(箱子管理)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getSingleBoxLocateByName", (req, res) => {
+  var sql = $sql.query.getSingleBoxLocateByName;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info,parms.customer_id], function(err, result) {
     if (err) {
       console.log(err);
     }

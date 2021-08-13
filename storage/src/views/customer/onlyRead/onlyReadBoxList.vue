@@ -6,6 +6,33 @@
 
     <div class="content-container">
       <el-row>
+        <el-col :span="10">
+          <el-form
+            :model="formData"
+            ref="formData"
+            label-width="100px"
+            label-position="left"
+          >
+            <el-form-item label="客户信息:" prop="customer_info">
+              <el-autocomplete
+                style="width:100%"
+                v-model="formData.customer_info"
+                :fetch-suggestions="querySearch"
+                clearable
+                id="formSearch"
+                placeholder="请输入客户编号或公司名称，为空时查询所有"
+              ></el-autocomplete>
+            </el-form-item>
+          </el-form>
+        </el-col>
+        <el-col style="margin-left:10px;" :span="2">
+          <el-button type="primary" @click="formSearch">查询</el-button>
+        </el-col>
+        <el-col :span="2">
+          <el-button type="info" @click="resetForm('formData')">重置</el-button>
+        </el-col>
+      </el-row>
+      <el-row>
         <el-col class="customer-table" :span="24">
           <el-table
             :height="tableHeight"
@@ -29,7 +56,7 @@
             ></el-table-column>
             <el-table-column
               align="center"
-              label="名称"
+              label="箱号"
               prop="product_name"
               width="200px"
             ></el-table-column>
@@ -43,13 +70,13 @@
               align="center"
               label="抛重重量(lb)"
               prop="weight"
-              width="150px"
+              width="150"
             ></el-table-column>
             <el-table-column
               align="center"
               label="实际重量(lb)"
               prop="real_weight"
-              width="150px"
+              width="150"
             ></el-table-column>
             <el-table-column
               align="center"
@@ -65,7 +92,7 @@
               align="center"
               label="入库时间"
               prop="come_time"
-              width="100px"
+              width="110px"
             ></el-table-column>
             <el-table-column
               align="center"
@@ -101,6 +128,7 @@ import { getNowFormatDate } from "@/utils/getCurrentTime";
 export default {
   data() {
     return {
+      customer_id: "",
       tableHeight: window.innerHeight * 0.65,
       times: 0, // 监听计数
       timer: null,
@@ -207,20 +235,22 @@ export default {
     },
     // 刷新查询
     refreshFormSearch() {
-      this.refreshGetBox()
+      this.refreshGetBox();
     },
     // 获取箱子信息
     getBox() {
       this.loading = true;
       this.$http({
         method: "post",
-        url: "api/query/getBoxLocateByName",
+        url: "api/query/getSingleBoxLocateByName",
         data: {
           customer_info: this.formData.customer_info,
+          customer_id:this.customer_id
         },
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
             for (let item of res.data) {
@@ -250,11 +280,12 @@ export default {
         method: "post",
         url: "api/query/getBoxLocateByName",
         data: {
-          customer_info:  sessionStorage.getItem("userName"),
+          customer_info: this.customer_id,
         },
       })
         .then((res) => {
           this.loading = false;
+          this.queryResData = [];
           console.log(res);
           if (res.data.length != 0) {
             for (let item of res.data) {
@@ -319,14 +350,18 @@ export default {
     },
     // 监听输入框，有变动就触发防抖函数
     getData() {
+      console.log(this.formData.customer_info)
+      console.log(this.customer_id)
       this.$http({
         method: "post",
-        url: "api/query/getBoxLocate",
+        url: "api/query/getSingleBoxLocate",
         data: {
           customer_info: this.formData.customer_info,
+          customer_id: this.customer_id,
         },
       })
         .then((res) => {
+          console.log(res)
           this.customer_info_list = res.data;
           if (this.formData.customer_info != "") {
             this.nameTipsArray = [];
@@ -493,7 +528,8 @@ export default {
     this.refreshFormSearch();
   },
   created() {
-    let that = this;
+    this.customer_id = sessionStorage.getItem("userName");
+    this.level = sessionStorage.getItem("userLevel");
   },
 };
 </script>

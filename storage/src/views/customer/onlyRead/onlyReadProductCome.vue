@@ -4,6 +4,36 @@
       <h1>货品入库</h1>
     </div>
 
+       <el-row>
+        <el-col :span="9">
+          <el-form
+            :model="formData"
+            ref="formData"
+            label-width="100px"
+            label-position="left"
+          >
+            <el-form-item label="客户信息:"   prop="customer_info">
+              <el-autocomplete
+                style="width:100%"
+                v-model="formData.customer_info"
+                :fetch-suggestions="querySearch"
+                clearable
+                id="formSearch"
+                placeholder="请输入客户编号或公司名称，为空时查询所有"
+              ></el-autocomplete>
+            </el-form-item>
+          </el-form>
+        </el-col>
+        <el-col style="margin-left:10px;" :span="2">
+          <el-button type="primary" @click="formSearch">查询</el-button>
+        </el-col>
+        <el-col :span="2">
+          <el-button type="info" @click="resetForm('formData')">重置</el-button>
+        </el-col>
+
+      </el-row>
+
+
     <div class="content-container">
       <el-row style="padding-top:10px">
         <el-col class="customer-table" :span="24">
@@ -30,7 +60,7 @@
               align="center"
               label="入库时间"
               prop="come_time"
-              width="100px"
+              width="110px"
             ></el-table-column>
             <el-table-column
               align="center"
@@ -178,6 +208,7 @@ import { getNowFormatDate } from "@/utils/getCurrentTime";
 export default {
   data() {
     return {
+      customer_id:"",
       tableHeight: window.innerHeight * 0.65,
       times: 0, // 监听计数
       timer: null,
@@ -340,41 +371,46 @@ export default {
       let form = this.$refs[formName];
       form.resetFields();
     },
-    // 查询
+  // 查询
     formSearch() {
       this.loading = true;
-
       this.$http({
         method: "post",
-        url: "api/query/getProductLocateByTime",
+        url: "/api/query/getSingleProductLocateByTime",
         data: {
           customer_info: this.formData.customer_info,
+          customer_id:this.customer_id,
         },
       })
         .then((res) => {
+          console.log(res);
           this.loading = false;
           this.queryResData = [];
           if (res.data.length != 0) {
-            this.$message.success("查询成功");
+            console.log(res);
+            this.queryResData = [];
             for (let item of res.data) {
               let come = Date.parse(new Date(item.come_time));
               let today = Date.parse(new Date(this.today_date));
               var day = parseInt((today - come) / (1000 * 60 * 60 * 24)); //核心：时间戳相减，然后除以天数
               item.save_days = day;
-
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+
+              item.leave_count =
+                Number(item.storage_count) - Number(item.out_count);
+              item.count = "";
+              this.queryResData.push(item);
             }
-            this.queryResData = res.data;
-          } else {
-            this.$message.warning("未查询到相关数据");
+            console.log(this.queryResData);
           }
         })
         .catch((err) => {
           this.$message.error(err);
         });
     },
+
 
     // 查询
     refreshFormSearch() {
@@ -418,16 +454,19 @@ export default {
     },
     // 监听输入框，有变动就触发防抖函数
     getData() {
+      console.log(this.customer_id)
+      console.log(this.formData.customer_info)
       this.$http({
         method: "post",
-        url: "api/query/getProductLocate",
+        url: "api/query/getSingleProductLocate",
         data: {
           customer_info: this.formData.customer_info,
+          customer_id: this.customer_id,
         },
       })
         .then((res) => {
-          console.log(res);
           this.customer_info_list = res.data;
+          console.log(res)
           if (this.formData.customer_info != "") {
             this.nameTipsArray = [];
             let avoidSameArr = [];
@@ -435,14 +474,16 @@ export default {
             // 并且,当历史列表已存在相同字段,则跳过此遍历阶段
             for (let item of this.customer_info_list) {
               let flag = 0; // 用于标记是否需要跳过
+
+
               // 遍历每个item对象
               for (let prop in item) {
-                console.log(item[prop]);
                 if (
                   String(item[prop]).indexOf(this.formData.customer_info) != -1
                 ) {
                   // 对防重数组遍历,若存在与历史列表对象中完全匹配的属性,则跳过此遍历
                   for (let val of avoidSameArr) {
+                    
                     if (val == item[prop]) {
                       flag = 1;
                       break;
@@ -664,8 +705,9 @@ export default {
 
     this.refreshFormSearch();
   },
-  created() {
-    let that = this;
+   created() {
+    this.customer_id = sessionStorage.getItem("userName");
+    this.level = sessionStorage.getItem("userLevel");
   },
 };
 </script>

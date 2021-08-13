@@ -197,7 +197,7 @@
             <el-col :span="24" style="padding-left:20px">
               <el-autocomplete
                 style="width:100%"
-                v-model="modifyForm.customer_id"
+                v-model="modifyForm.company_name"
                 :fetch-suggestions="querySearch"
                 clearable
                 id="formSearch"

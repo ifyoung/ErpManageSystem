@@ -218,7 +218,8 @@ export default {
         },
       })
         .then((res) => {
-          this.loading = false; this.queryResData=[];
+          this.loading = false;
+          this.queryResData = [];
           this.queryResData = [];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
@@ -250,7 +251,8 @@ export default {
         url: "/api/query/getAllProductByTime",
       })
         .then((res) => {
-          this.loading = false; this.queryResData=[];
+          this.loading = false;
+          this.queryResData = [];
           this.queryResData = [];
           if (res.data.length != 0) {
             this.$message.success("查询成功");
@@ -279,12 +281,13 @@ export default {
       this.$http({
         method: "post",
         url: "/api/query/getProductLocateByTime",
-        data:{
-          customer_info:this.formData.customer_info
+        data: {
+          customer_info: this.formData.customer_info,
         },
       })
         .then((res) => {
-          this.loading = false; this.queryResData=[];
+          this.loading = false;
+          this.queryResData = [];
           this.queryResData = [];
           for (let item of res.data) {
             let come = Date.parse(new Date(item.come_time));
@@ -316,8 +319,11 @@ export default {
       ) {
         this.$message.warning("出货的数量已超过初始仓储数量");
         return;
-      } else if (Number(row.storage_count) < 0) {
+      } else if (Number(row.count) < 0) {
         this.$message.warning("出货的数量不能为负数");
+        return;
+      } else if (isNaN(Number(row.count))) {
+        this.$message.warning("存在非数字字符!");
         return;
       }
 
