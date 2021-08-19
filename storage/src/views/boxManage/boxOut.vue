@@ -344,6 +344,8 @@ export default {
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
               item.operateCount = "";
+                item.leave_count = Number(item.count) 
+                 item.count = Number(item.count)+Number(item.out_count)
             }
             this.queryResData = res.data;
           } else {
@@ -385,7 +387,8 @@ export default {
               item.come_time = utcToCst(item.come_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
-
+ item.leave_count = Number(item.count) 
+                 item.count = Number(item.count)+Number(item.out_count)
               item.operateCount = "";
             }
             this.queryResData = res.data;
@@ -492,6 +495,7 @@ export default {
         return;
       }
 
+      // count仓储数量  出库数量+操作数量>仓储数量
       if (
         Number(row.out_count) + Number(row.operateCount) >
         Number(row.count)

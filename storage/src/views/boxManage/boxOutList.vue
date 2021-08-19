@@ -323,10 +323,11 @@ export default {
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
 
-              // item.out_time = utcToCst(item.out_time)
-              //   .slice(0, 10)
-              //   .replace(/上|下|中|午|晚|早|凌|晨/g, "");
-              item.leave_count = Number(item.count) - Number(item.out_count);
+              item.out_time = utcToCst(item.out_time)
+                .slice(0, 10)
+                .replace(/上|下|中|午|晚|早|凌|晨/g, "");
+               item.leave_count = Number(item.count) 
+                 item.count = Number(item.count)+Number(item.out_count)
             }
 
             this.queryResData = res.data;
@@ -364,7 +365,8 @@ export default {
               item.out_time = utcToCst(item.out_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
-              item.leave_count = Number(item.count) - Number(item.out_count);
+              item.leave_count = Number(item.count) 
+                 item.count = Number(item.count)+Number(item.out_count)
             }
             this.queryResData = res.data;
           }

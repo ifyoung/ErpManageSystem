@@ -669,6 +669,36 @@ router.post("/getOutRecordLocateByTime", (req, res) => {
   });
 });
 
+ // (已知客户编号)(出库记录)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+router.post("/getSingleOutRecordLocate", (req, res) => {
+  var sql = $sql.query.getSingleOutRecordLocate;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info,parms.customer_id], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
+ // (已知客户编号)(时间排序)(出库记录)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
+ router.post("/getSingleOutRecordLocateByTime", (req, res) => {
+  var sql = $sql.query.getSingleOutRecordLocateByTime;
+  var parms = req.body;
+  console.log(parms);
+  conn.query(sql, [parms.customer_info,parms.customer_id], function(err, result) {
+    if (err) {
+      console.log(err);
+    }
+    if (result) {
+      res.send(result);
+    }
+  });
+});
+
 // 客户信息模糊查询
 router.post("/getCustomerDialogLocate", (req, res) => {
   var sql = $sql.query.getCustomerDialogLocate;

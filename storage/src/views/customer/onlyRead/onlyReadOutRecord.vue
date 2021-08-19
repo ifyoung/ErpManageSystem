@@ -49,11 +49,6 @@
           >
             <el-table-column
               align="center"
-              label="客户编号"
-              prop="customer_id"
-            ></el-table-column>
-            <el-table-column
-              align="center"
               label="公司名称"
               prop="company_name"
             ></el-table-column>
@@ -77,11 +72,6 @@
               align="center"
               label="出库数量"
               prop="out_count"
-            ></el-table-column>
-            <el-table-column
-              align="center"
-              label="操作者"
-              prop="out_source"
             ></el-table-column>
           </el-table>
         </el-col>
@@ -112,6 +102,7 @@ import { getNowFormatDate } from "@/utils/getCurrentTime";
 export default {
   data() {
     return {
+      customer_id:"",
       tableHeight: window.innerHeight * 0.65,
       times: 0, // 监听计数
       timer: null,
@@ -179,9 +170,10 @@ export default {
       this.loading = true;
       this.$http({
         method: "post",
-        url: "api/query/getOutRecordLocateByTime",
+        url: "api/query/getSingleOutRecordLocateByTime",
         data: {
           customer_info: this.formData.customer_info,
+          customer_id:this.customer_id
         },
       })
         .then((res) => {
@@ -191,7 +183,7 @@ export default {
             this.queryResData = [];
             this.$message.success("查询成功");
             for (let item of res.data) {
-              if (item.status == "true") {
+              if (item.status == "true" || item.out_source == "管理员") {
                 continue;
               } else {
                 item.out_time = utcToCst(item.out_time)
@@ -248,9 +240,10 @@ export default {
       this.loading = true;
       this.$http({
         method: "post",
-        url: "/api/query/getOutRecordLocateByTime",
+        url: "/api/query/getSingleOutRecordLocateByTime",
         data: {
           customer_info: this.formData.customer_info,
+          customer_id: this.customer_id,
         },
       })
         .then((res) => {
@@ -283,12 +276,14 @@ export default {
     getData() {
       this.$http({
         method: "post",
-        url: "api/query/getOutRecordLocate",
+        url: "api/query/getSingleOutRecordLocate",
         data: {
           customer_info: this.formData.customer_info,
+          customer_id:this.customer_id
         },
       })
         .then((res) => {
+          console.log(res)
           this.customer_info_list = res.data;
           if (this.formData.customer_info != "") {
             this.nameTipsArray = [];
@@ -369,7 +364,9 @@ export default {
       today.getDate();
     this.today_date = today_date;
   },
-  created() {
+ created() {
+    this.customer_id = sessionStorage.getItem("userName");
+    this.level = sessionStorage.getItem("userLevel");
   },
 };
 </script>
