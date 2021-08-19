@@ -3,8 +3,8 @@
     <div class="module-title">
       <h1>箱子入库</h1>
     </div>
-    <div class="content-container">
-     <el-row>
+    <div>
+     <el-row  class="content-container">
         <el-col :span="10">
           <el-form
             :model="formData"

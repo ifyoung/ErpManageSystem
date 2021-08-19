@@ -1,13 +1,13 @@
 var mysql = require('mysql');
 
 // 上线项目 数据库链接地址
-      var connection = {
-          host: 'localhost',
-          user: 'erp_mysql',
-         password: 'Adadasd001', // mysql用户名密码
-         database: 'erp_mysql', // mysql数据库名
-         port: '3306' // mysql链接端口
-    }
+    //   var connection = {
+    //       host: 'localhost',
+    //       user: 'erp_mysql',
+    //      password: 'Adadasd001', // mysql用户名密码
+    //      database: 'erp_mysql', // mysql数据库名
+    //      port: '3306' // mysql链接端口
+    // }
 
 // 上线项目 数据库链接地址
 //  var connection = {
@@ -19,13 +19,13 @@ var mysql = require('mysql');
 //  }
 
 // 开发项目 数据库连接地址
-// var connection = {
-// host: 'localhost',
-// user: 'root',
-// password: 'bishe123', // mysql用户名密码
-//  database: '99erp', // mysql数据库名
-// port: '3306' // mysql链接端口
-// }
+var connection = {
+host: 'localhost',
+user: 'root',
+password: 'bishe123', // mysql用户名密码
+ database: '99erp', // mysql数据库名
+port: '3306' // mysql链接端口
+}
 
 // 用于保存数据连接实例
 var db = null;

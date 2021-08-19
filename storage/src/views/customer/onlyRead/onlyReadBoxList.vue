@@ -4,8 +4,8 @@
       <h1>箱子清单</h1>
     </div>
 
-    <div class="content-container">
-      <el-row>
+    <div>
+      <el-row  class="content-container">
         <el-col :span="10">
           <el-form
             :model="formData"

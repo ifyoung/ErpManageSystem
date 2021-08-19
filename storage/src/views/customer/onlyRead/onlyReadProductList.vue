@@ -4,7 +4,7 @@
       <h1>货品清单</h1>
     </div>
 
-     <el-row>
+     <el-row class="content-container">
         <el-col :span="9">
           <el-form
             :model="formData"
@@ -33,7 +33,7 @@
 
       </el-row>
 
-    <div class="content-container">
+    <div >
       <el-row>
         <el-col class="customer-table" :span="24">
           <el-table

@@ -507,7 +507,7 @@ export default {
           out_count: data.count,
           record_code: random,
           status: "false",
-          out_source: this.level,
+          out_source: "客户",
         },
       })
         .then((res) => {
