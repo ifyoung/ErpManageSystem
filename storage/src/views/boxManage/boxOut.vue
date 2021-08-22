@@ -561,7 +561,7 @@ export default {
           out_count: row.operateCount,
           record_code: random,
           status: "false",
-          out_source: this.level,
+          out_source: "管理员",
         },
       })
         .then((res) => {
