@@ -66,9 +66,9 @@ var sqlMap = {
     getOutRecordLocateByTime: `SELECT c.customer_id,c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku,o.record_code,o.status,o.out_source FROM  out_record o,customer_info c WHERE CONCAT(o.product_sku,o.product_name,c.company_name,c.customer_id,o.out_source) LIKE CONCAT("%",?,"%") and o.customer_id = c.customer_id ORDER BY o.out_time desc`,
 
     // (已知客户编号)(出库记录)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
-    getSingleOutRecordLocate: `SELECT o.out_source,c.company_name,o.product_name,o.product_sku FROM out_record o,customer_info c WHERE CONCAT(o.product_sku,o.product_name,c.company_name) LIKE CONCAT("%",?,"%") and o.status='false' and o.customer_id = c.customer_id and  o.out_source="客户" and o.customer_id = ? ORDER BY o.out_time desc`,
+    getSingleOutRecordLocate: `SELECT o.out_source,c.company_name,o.product_name,o.product_sku FROM out_record o,customer_info c WHERE CONCAT(o.product_sku,o.product_name,c.company_name) LIKE CONCAT("%",?,"%") and o.status='false' and o.customer_id = c.customer_id and o.customer_id = ? ORDER BY o.out_time desc`,
      // (已知客户编号)(时间排序)(出库记录)依据客户信息(可以是客户编号、公司名称、货品名称、货品sku)模糊查询
-     getSingleOutRecordLocateByTime: `SELECT c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku,o.record_code,o.status,o.out_source FROM  out_record o,customer_info c WHERE CONCAT(o.product_sku,o.product_name,c.company_name,o.out_source) LIKE CONCAT("%",?,"%") and  o.out_source="客户" and  o.customer_id = c.customer_id and o.customer_id = ? ORDER BY o.out_time desc`,
+     getSingleOutRecordLocateByTime: `SELECT c.company_name,o.out_count,o.out_time,o.product_name,o.product_sku,o.record_code,o.status,o.out_source FROM  out_record o,customer_info c WHERE CONCAT(o.product_sku,o.product_name,c.company_name,o.out_source) LIKE CONCAT("%",?,"%")  and  o.customer_id = c.customer_id and o.customer_id = ? ORDER BY o.out_time desc`,
 
 
     // 添加、修改框下的模糊查询

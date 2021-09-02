@@ -39,6 +39,7 @@
             </template>
             <el-menu-item-group>
               <el-menu-item index="/cusProductList">货品清单</el-menu-item>
+               <el-menu-item index="/onlyReadOutRecord">出库记录</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
 
@@ -55,7 +56,6 @@
               <el-menu-item index="/onlyReadProductList">货品清单</el-menu-item>
               <el-menu-item index="/onlyReadBoxCome">箱子入库</el-menu-item>
               <el-menu-item index="/onlyReadBoxList">箱子清单</el-menu-item>
-              <el-menu-item index="/onlyReadOutRecord">出库记录</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
 

@@ -73,6 +73,11 @@
               label="出库数量"
               prop="out_count"
             ></el-table-column>
+              <el-table-column
+              align="center"
+              label="操作员"
+              prop="out_source"
+            ></el-table-column>
           </el-table>
         </el-col>
       </el-row>
@@ -183,7 +188,7 @@ export default {
             this.queryResData = [];
             this.$message.success("查询成功");
             for (let item of res.data) {
-              if (item.status == "true" || item.out_source == "管理员") {
+              if (item.status == "true" ) {
                 continue;
               } else {
                 item.out_time = utcToCst(item.out_time)
@@ -256,9 +261,6 @@ export default {
               // 如果状态显示已出库，则不显示在出库记录中，跳过此循环
               continue;
             } else {
-              if(item.out_source=="管理员"){
-                continue;
-              }
               item.out_time = utcToCst(item.out_time)
                 .slice(0, 10)
                 .replace(/上|下|中|午|晚|早|凌|晨/g, "");
